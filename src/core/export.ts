@@ -86,6 +86,14 @@ export function exportPatternPNG(p: Pattern) {
   );
 }
 export function exportChartPNG(p: Pattern) {
+  // Check before allocating the large grid canvas (512² at 24px is 151 MP).
+  const expectedWidth = Math.max(900, Math.ceil(p.width * 24 + 86.4) + 80);
+  const expectedHeight =
+    Math.ceil(p.height * 24 + 86.4) +
+    225 +
+    Math.ceil(getStats(p).colorCount / 4) * 42;
+  if (expectedWidth * expectedHeight > 40_000_000)
+    throw new Error("带统计图纸过大，请改用分页 PDF；纯图案 PNG 仍可导出。");
   const stats = getStats(p),
     cellSize = 24,
     grid = patternCanvas(p, {
@@ -196,12 +204,14 @@ export async function exportPDF(
       600,
     );
     const thumb = patternCanvas(p, {
-      cellSize: Math.min(5, 360 / Math.max(p.width, p.height)),
+      cellSize: 1,
       grid: false,
       codes: false,
       coordinates: false,
     });
-    ctx.drawImage(thumb, 830, 220, thumb.width, thumb.height);
+    const thumbScale = Math.min(5, 360 / Math.max(p.width, p.height));
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(thumb, 830, 220, p.width * thumbScale, p.height * thumbScale);
     legend(ctx, p, 72, 240, 360, 2, 43, l * 60, (l + 1) * 60);
     text(
       ctx,

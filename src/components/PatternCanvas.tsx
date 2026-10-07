@@ -30,6 +30,7 @@ export function PatternCanvas({
     draft = useRef<Pattern | null>(null);
   const [zoom, setZoom] = useState(1),
     [pan, setPan] = useState({ x: 0, y: 0 });
+  const [viewport, setViewport] = useState({ width: 1, height: 1 });
   const gesture = useRef<{
     type: "draw" | "pan";
     x: number;
@@ -44,26 +45,42 @@ export function PatternCanvas({
   const render = useCallback(() => {
     const c = canvas.current;
     if (!c) return;
-    const ratio = Math.min(2, window.devicePixelRatio || 1, 3000 / Math.max(w, h));
-    c.width = Math.ceil(w * ratio);
-    c.height = Math.ceil(h * ratio);
+    // Render only the viewport at device resolution; zoom never enlarges a
+    // low-resolution full-chart bitmap, and a 512² chart stays cheap to pan.
+    const ratio = Math.min(2, window.devicePixelRatio || 1);
+    c.width = Math.ceil(viewport.width * ratio);
+    c.height = Math.ceil(viewport.height * ratio);
     const ctx = c.getContext("2d")!;
     ctx.scale(ratio, ratio);
+    const left = (viewport.width - w * zoom) / 2 + pan.x,
+      top = (viewport.height - h * zoom) / 2 + pan.y;
+    ctx.translate(left, top);
+    ctx.scale(zoom, zoom);
     drawPattern(ctx, draft.current ?? pattern, {
       ...display,
+      codes: display.codes && CELL * zoom >= 10,
+      fineGrid: CELL * zoom >= 5,
+      pixelSnap: { scale: zoom * ratio, x: left * ratio, y: top * ratio },
       cellSize: CELL,
       gutter: GUTTER,
       highlight,
+      viewport: {
+        left: -left / zoom,
+        top: -top / zoom,
+        right: (viewport.width - left) / zoom,
+        bottom: (viewport.height - top) / zoom,
+      },
     });
-  }, [w, h, pattern, display, highlight]);
+  }, [w, h, pattern, display, highlight, viewport, zoom, pan]);
   useEffect(() => {
     render();
   }, [render]);
   const fit = useCallback(() => {
     if (!host.current) return;
     const r = host.current.getBoundingClientRect();
+    setViewport({ width: r.width, height: r.height });
     setZoom(
-      Math.max(0.04, Math.min(2, (r.width - 64) / w, (r.height - 64) / h)),
+      Math.max(0.025, Math.min(2, (r.width - 32) / w, (r.height - 32) / h)),
     );
     setPan({ x: 0, y: 0 });
   }, [w, h]);
@@ -76,7 +93,7 @@ export function PatternCanvas({
     const wheel = (e: WheelEvent) => {
       e.preventDefault();
       setZoom((z) =>
-        Math.max(0.04, Math.min(8, z * Math.exp(-e.deltaY * 0.0015))),
+        Math.max(0.025, Math.min(8, z * Math.exp(-e.deltaY * 0.0015))),
       );
     };
     element.addEventListener("wheel", wheel, { passive: false });
@@ -91,8 +108,10 @@ export function PatternCanvas({
   }, [fit]);
   const cellAt = (e: React.PointerEvent) => {
     const r = canvas.current!.getBoundingClientRect();
-    const x = Math.floor(((e.clientX - r.left) / zoom - g) / CELL),
-      y = Math.floor(((e.clientY - r.top) / zoom - g) / CELL);
+    const left = (r.width - w * zoom) / 2 + pan.x,
+      top = (r.height - h * zoom) / 2 + pan.y;
+    const x = Math.floor(((e.clientX - r.left - left) / zoom - g) / CELL),
+      y = Math.floor(((e.clientY - r.top - top) / zoom - g) / CELL);
     return x >= 0 && x < pattern.width && y >= 0 && y < pattern.height
       ? y * pattern.width + x
       : null;
@@ -138,17 +157,10 @@ export function PatternCanvas({
   };
   return (
     <div className="canvas-host" ref={host} data-testid="canvas-host">
-      <div
-        className={`canvas-stage tool-${tool}`}
-        style={{
-          transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
-          width: w,
-          height: h,
-        }}
-      >
+      <div className={`canvas-stage viewport-stage tool-${tool}`}>
         <canvas
           ref={canvas}
-          style={{ width: w, height: h }}
+          style={{ width: "100%", height: "100%" }}
           aria-label="拼豆图纸编辑画布"
           onPointerDown={(e) => {
             if (disabled) return;
@@ -204,15 +216,24 @@ export function PatternCanvas({
           onLostPointerCapture={finish}
         />
       </div>
+      {display.codes && CELL * zoom < 10 && (
+        <span className="canvas-hint">放大后查看色号</span>
+      )}
       <div className="zoom-controls">
         <button
           aria-label="缩小"
           title="缩小"
-          onClick={() => setZoom((z) => Math.max(0.04, z / 1.25))}
+          onClick={() => setZoom((z) => Math.max(0.025, z / 1.25))}
         >
           <ZoomOut size={17} />
         </button>
-        <span>{Math.round(zoom * 100)}%</span>
+        <span
+          title={
+            display.codes && CELL * zoom < 10 ? "放大后显示色号" : "当前缩放"
+          }
+        >
+          {Math.round(zoom * 100)}%
+        </span>
         <button
           aria-label="放大"
           title="放大"

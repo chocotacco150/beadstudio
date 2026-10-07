@@ -63,12 +63,21 @@ import { PatternCanvas } from "./components/PatternCanvas";
 import { CropDialog } from "./components/CropDialog";
 import { Modal } from "./components/Modal";
 const defaultSettings: ConvertSettings = {
-  width: 48,
-  height: 48,
+  width: 128,
+  height: 128,
   keepRatio: true,
-  maxColors: 16,
+  maxColors: 32,
   dither: false,
   background: null,
+  mode: "photo",
+  smoothing: 1,
+  contrast: 8,
+  removeBackground: false,
+  backgroundTolerance: 8,
+};
+const samples = {
+  photo: { src: "/sample-photo.jpg", name: "庭院里的向日葵" },
+  pixel: { src: "/sample-cat.png", name: "茶杯里的小橘" },
 };
 const toolItems = [
   { key: "brush", label: "画笔", shortcut: "B", icon: Brush },
@@ -82,9 +91,9 @@ export default function App() {
   const [settings, setSettings] = useState(defaultSettings),
     [palette, setPalette] = useState<Palette>(mardPalette),
     [palettes, setPalettes] = useState(builtInPalettes);
-  const [source, setSource] = useState("/sample-cat.png"),
+  const [source, setSource] = useState(samples.photo.src),
     [image, setImage] = useState<HTMLImageElement | null>(null),
-    [sourceName, setSourceName] = useState("茶杯里的小橘"),
+    [sourceName, setSourceName] = useState(samples.photo.name),
     [crop, setCrop] = useState<Crop>(fullCrop);
   const [busy, setBusy] = useState(false),
     [progress, setProgress] = useState(0),
@@ -95,7 +104,7 @@ export default function App() {
     [selected, setSelected] = useState("A6"),
     [highlight, setHighlight] = useState<string | null>(null),
     [display, setDisplay] = useState<DisplayOptions>({
-      grid: true,
+      grid: false,
       codes: false,
       coordinates: true,
     });
@@ -152,10 +161,11 @@ export default function App() {
       return null;
     }
   }, [settings, image, crop]);
+  useEffect(() => setHover("每格一颗拼豆"), [pattern?.width, pattern?.height]);
   useEffect(() => {
     let active = true;
     setBusy(true);
-    loadImage("/sample-cat.png")
+    loadImage(samples.photo.src)
       .then(async (img) => {
         if (!active) return;
         setImage(img);
@@ -164,7 +174,7 @@ export default function App() {
           fullCrop,
           defaultSettings,
           mardPalette,
-          "茶杯里的小橘",
+          samples.photo.name,
           (n) => {
             if (active) setProgress(n);
           },
@@ -263,7 +273,7 @@ export default function App() {
         crop,
         settings,
         palette,
-        pattern?.name ?? sourceName,
+        sourceName,
         setProgress,
       );
       history.commit(p);
@@ -277,18 +287,38 @@ export default function App() {
       setBusy(false);
     }
   }
-  async function useSample() {
+  async function useSample(kind: "photo" | "pixel") {
     if (busy) return;
     setBusy(true);
     setProgress(0);
     try {
-      const img = await loadImage("/sample-cat.png");
+      const sample = samples[kind];
+      const nextSettings =
+        kind === "photo"
+          ? {
+              ...settings,
+              mode: "photo" as const,
+              width: 128,
+              height: 128,
+              maxColors: 32,
+              keepRatio: true,
+              removeBackground: false,
+            }
+          : {
+              ...settings,
+              mode: "pixel" as const,
+              width: 64,
+              height: 64,
+              keepRatio: true,
+              removeBackground: false,
+            };
+      const img = await loadImage(sample.src);
       const p = await convertImage(
         img,
         fullCrop,
-        settings,
+        nextSettings,
         palette,
-        "茶杯里的小橘",
+        sample.name,
         setProgress,
       );
       if (objectURL.current) {
@@ -296,8 +326,9 @@ export default function App() {
         objectURL.current = null;
       }
       setImage(img);
-      setSource("/sample-cat.png");
-      setSourceName("茶杯里的小橘");
+      setSettings(nextSettings);
+      setSource(sample.src);
+      setSourceName(sample.name);
       setCrop(fullCrop);
       history.commit(p);
       setHighlight(null);
@@ -359,6 +390,7 @@ export default function App() {
   }
   async function handleExport() {
     if (!pattern || busy) return;
+    setMessage(null);
     setBusy(true);
     setProgress(0);
     try {
@@ -425,7 +457,10 @@ export default function App() {
           </button>
           <button
             className="primary export-button"
-            onClick={() => setDialog("export")}
+            onClick={() => {
+              setMessage(null);
+              setDialog("export");
+            }}
             disabled={!pattern || busy}
           >
             <ArrowDownToLine size={17} />
@@ -518,22 +553,44 @@ export default function App() {
                   <CropIcon size={16} />
                 </button>
               </div>
-              <button
-                className="sample-link"
-                onClick={useSample}
-                disabled={busy}
-              >
-                <Sparkles size={14} />
-                试试示例图片
-              </button>
+              <div className="sample-links">
+                <button
+                  className="sample-link"
+                  onClick={() => useSample("photo")}
+                  disabled={busy}
+                >
+                  <FileImage size={14} />
+                  真实照片
+                </button>
+                <button
+                  className="sample-link"
+                  onClick={() => useSample("pixel")}
+                  disabled={busy}
+                >
+                  <Sparkles size={14} />
+                  像素插画
+                </button>
+              </div>
+              {source === samples.photo.src && (
+                <p className="sample-credit">
+                  Don McCulley · CC0 ·{" "}
+                  <a
+                    href="https://commons.wikimedia.org/wiki/File:Sunflower_Public_Domain.jpg"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    照片来源
+                  </a>
+                </p>
+              )}
             </section>
             <section className="control-section">
               <div className="section-heading">
                 <h3>图纸尺寸</h3>
                 <span>每格 = 1 颗</span>
               </div>
-              <div className="preset-row">
-                {[32, 48, 64].map((n) => (
+              <div className="preset-row size-presets">
+                {[32, 48, 64, 96, 128, 192, 256].map((n) => (
                   <button
                     key={n}
                     className={
@@ -557,7 +614,7 @@ export default function App() {
                     aria-label="图纸宽度"
                     type="number"
                     min="1"
-                    max="200"
+                    max="512"
                     value={Number.isNaN(settings.width) ? "" : settings.width}
                     disabled={busy}
                     onChange={(e) =>
@@ -575,7 +632,7 @@ export default function App() {
                     aria-label="图纸高度"
                     type="number"
                     min="1"
-                    max="200"
+                    max="512"
                     value={Number.isNaN(settings.height) ? "" : settings.height}
                     disabled={busy}
                     onChange={(e) =>
@@ -600,8 +657,114 @@ export default function App() {
               <p className={`dimension-hint ${dimensions ? "" : "error-text"}`}>
                 {dimensions
                   ? `实际生成 ${dimensions.width} 列 × ${dimensions.height} 行`
-                  : "请输入 1–200 的整数尺寸"}
+                  : "请输入 1–512 的整数尺寸"}
               </p>
+              {dimensions && (
+                <p className="detail-note">
+                  5 mm 拼豆约 {(dimensions.width * 0.5).toFixed(1)} ×{" "}
+                  {(dimensions.height * 0.5).toFixed(1)} cm
+                  {settings.mode === "photo" &&
+                  Math.max(dimensions.width, dimensions.height) < 96
+                    ? "；照片建议 96 格以上"
+                    : ""}
+                </p>
+              )}
+            </section>
+            <section className="control-section photo-controls">
+              <h3>照片处理</h3>
+              <label className="field-label">
+                图像类型
+                <select
+                  aria-label="图像类型"
+                  value={settings.mode}
+                  disabled={busy}
+                  onChange={(e) =>
+                    updateSetting("mode", e.target.value as "photo" | "pixel")
+                  }
+                >
+                  <option value="photo">日常照片 · 区域采样</option>
+                  <option value="pixel">像素插画 · 清晰色块</option>
+                </select>
+              </label>
+              {settings.mode === "photo" && (
+                <>
+                  <label className="field-label">
+                    碎色简化
+                    <select
+                      aria-label="碎色简化"
+                      value={settings.smoothing}
+                      disabled={busy}
+                      onChange={(e) =>
+                        updateSetting("smoothing", Number(e.target.value))
+                      }
+                    >
+                      <option value={0}>关闭 · 保留纹理</option>
+                      <option value={1}>适中 · 减少噪点</option>
+                      <option value={2}>较强 · 简化复杂背景</option>
+                    </select>
+                  </label>
+                  <label className="range-label">
+                    轮廓对比 <span>{settings.contrast}%</span>
+                    <input
+                      aria-label="轮廓对比"
+                      type="range"
+                      min={0}
+                      max={30}
+                      step={2}
+                      value={settings.contrast}
+                      disabled={busy}
+                      onChange={(e) =>
+                        updateSetting("contrast", Number(e.target.value))
+                      }
+                    />
+                  </label>
+                </>
+              )}
+              <label className="field-label">
+                照片背景
+                <select
+                  aria-label="照片背景"
+                  value={settings.removeBackground ? "remove" : "keep"}
+                  disabled={busy}
+                  onChange={(e) =>
+                    updateSetting(
+                      "removeBackground",
+                      e.target.value === "remove",
+                    )
+                  }
+                >
+                  <option value="keep">完整保留背景</option>
+                  <option value="remove">去除边缘纯色背景</option>
+                </select>
+              </label>
+              {settings.removeBackground ? (
+                <>
+                  <label className="range-label">
+                    去背景容差 <span>{settings.backgroundTolerance}</span>
+                    <input
+                      aria-label="去背景容差"
+                      type="range"
+                      min={2}
+                      max={20}
+                      value={settings.backgroundTolerance}
+                      disabled={busy}
+                      onChange={(e) =>
+                        updateSetting(
+                          "backgroundTolerance",
+                          Number(e.target.value),
+                        )
+                      }
+                    />
+                  </label>
+                  <p className="detail-note">
+                    适合纯色纸张、白墙等背景。从边缘去除相近颜色；复杂场景请保留背景并裁剪主体。
+                  </p>
+                </>
+              ) : (
+                <p className="detail-note">
+                  有背景的照片可直接转换。先裁剪突出主体，或调高碎色简化减少背景纹理。
+                </p>
+              )}
             </section>
             <section className="control-section">
               <h3>颜色与细节</h3>
@@ -1150,6 +1313,11 @@ export default function App() {
               </p>
             </div>
           )}
+          {message?.error && (
+            <p className="dialog-error" role="alert">
+              {message.text}
+            </p>
+          )}
           <div className="modal-actions">
             <span>
               {stats.total.toLocaleString()} 颗 · {stats.colorCount} 色
@@ -1250,7 +1418,11 @@ export default function App() {
             </pre>
             <p>
               通用示例的 S 编号由本工具自定义。Mard
-              色号来自你提供的第三方对照页。最多支持 200 × 200 格。
+              色号来自你提供的第三方对照页。最多支持 512 × 512 格。
+            </p>
+            <p>
+              照片推荐 128 格 / 32
+              色起步。碎色简化减少照片噪点并保留边缘；像素插画模式使用最近邻采样。纯色去背景只处理与边缘连通的相近颜色，不适用于复杂场景的自动主体识别。
             </p>
           </div>
         </Modal>

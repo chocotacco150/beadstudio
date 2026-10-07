@@ -41,14 +41,11 @@ export function convertImage(
     settings.keepRatio,
   );
   const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
+  const scale = settings.mode === "photo" ? 3 : 1;
+  canvas.width = width * scale;
+  canvas.height = height * scale;
   const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
-  if (settings.background) {
-    ctx.fillStyle = settings.background;
-    ctx.fillRect(0, 0, width, height);
-  }
-  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingEnabled = settings.mode === "photo";
   ctx.imageSmoothingQuality = "high";
   ctx.drawImage(
     image,
@@ -58,10 +55,11 @@ export function convertImage(
     crop.height * image.naturalHeight,
     0,
     0,
-    width,
-    height,
+    canvas.width,
+    canvas.height,
   );
-  const pixels = ctx.getImageData(0, 0, width, height);
+  const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  progress(3);
   return new Promise((resolve, reject) => {
     const worker = new Worker(
       new URL("../workers/convert.worker.ts", import.meta.url),
@@ -105,6 +103,8 @@ export function convertImage(
         colors: palette.colors,
         maxColors: settings.maxColors,
         dither: settings.dither,
+        scale,
+        settings,
       },
       [pixels.data.buffer],
     );

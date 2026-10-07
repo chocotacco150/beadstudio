@@ -14,7 +14,16 @@ export function useHistory() {
     (p: Pattern) => {
       if (current.current) {
         past.current.push(current.current);
-        if (past.current.length > 50) past.current.shift();
+        let cells = past.current.reduce(
+          (sum, item) => sum + item.cells.length,
+          0,
+        );
+        while (
+          past.current.length > 1 &&
+          (past.current.length > 50 || cells > 2_000_000)
+        ) {
+          cells -= past.current.shift()!.cells.length;
+        }
       }
       future.current = [];
       update(p);

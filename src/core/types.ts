@@ -30,6 +30,11 @@ export interface ConvertSettings {
   maxColors: number;
   dither: boolean;
   background: string | null;
+  mode: "photo" | "pixel";
+  smoothing: number;
+  contrast: number;
+  removeBackground: boolean;
+  backgroundTolerance: number;
 }
 export interface DisplayOptions {
   grid: boolean;
@@ -37,5 +42,5 @@ export interface DisplayOptions {
   coordinates: boolean;
 }
 export type Tool = "brush" | "eraser" | "picker" | "pan";
-export const MAX_DIMENSION = 200;
-export const MAX_CELLS = 40000;
+export const MAX_DIMENSION = 512;
+export const MAX_CELLS = 262144;

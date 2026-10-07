@@ -1,0 +1,7 @@
+Sample photograph: Sunflower Public Domain
+Photographer: Don McCulley
+License: CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/)
+Source: https://commons.wikimedia.org/wiki/File:Sunflower_Public_Domain.jpg
+Original: https://upload.wikimedia.org/wikipedia/commons/2/29/Sunflower_Public_Domain.jpg
+Original dimensions: 5040 x 4000
+Bundled example: proportionally resized to 1600 x 1270 and JPEG optimized.
