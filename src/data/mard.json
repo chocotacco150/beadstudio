@@ -1,0 +1,1112 @@
+{
+  "name": "Mard · 221 色对照",
+  "source": "https://www.pindou.online/en/colors",
+  "description": "来自 Pindou Online 的第三方 Mard 221 色对照，采集于 2026-10-07。不是品牌官方发布；实际颜色以实物为准。",
+  "colors": [
+    {
+      "code": "A1",
+      "name": "Mard A1",
+      "hex": "#FAF4C8"
+    },
+    {
+      "code": "A2",
+      "name": "Mard A2",
+      "hex": "#FFFFD5"
+    },
+    {
+      "code": "A3",
+      "name": "Mard A3",
+      "hex": "#FEFF8B"
+    },
+    {
+      "code": "A4",
+      "name": "Mard A4",
+      "hex": "#FBED56"
+    },
+    {
+      "code": "A5",
+      "name": "Mard A5",
+      "hex": "#F4D738"
+    },
+    {
+      "code": "A6",
+      "name": "Mard A6",
+      "hex": "#FEAC4C"
+    },
+    {
+      "code": "A7",
+      "name": "Mard A7",
+      "hex": "#FE8B4C"
+    },
+    {
+      "code": "A8",
+      "name": "Mard A8",
+      "hex": "#FFDA45"
+    },
+    {
+      "code": "A9",
+      "name": "Mard A9",
+      "hex": "#FF995B"
+    },
+    {
+      "code": "A10",
+      "name": "Mard A10",
+      "hex": "#F77C31"
+    },
+    {
+      "code": "A11",
+      "name": "Mard A11",
+      "hex": "#FFDD99"
+    },
+    {
+      "code": "A12",
+      "name": "Mard A12",
+      "hex": "#FE9F72"
+    },
+    {
+      "code": "A13",
+      "name": "Mard A13",
+      "hex": "#FFC365"
+    },
+    {
+      "code": "A14",
+      "name": "Mard A14",
+      "hex": "#FD543D"
+    },
+    {
+      "code": "A15",
+      "name": "Mard A15",
+      "hex": "#FFF365"
+    },
+    {
+      "code": "A16",
+      "name": "Mard A16",
+      "hex": "#FFFF9F"
+    },
+    {
+      "code": "A17",
+      "name": "Mard A17",
+      "hex": "#FFE36E"
+    },
+    {
+      "code": "A18",
+      "name": "Mard A18",
+      "hex": "#FEBE7D"
+    },
+    {
+      "code": "A19",
+      "name": "Mard A19",
+      "hex": "#FD7C72"
+    },
+    {
+      "code": "A20",
+      "name": "Mard A20",
+      "hex": "#FFD568"
+    },
+    {
+      "code": "A21",
+      "name": "Mard A21",
+      "hex": "#FFE395"
+    },
+    {
+      "code": "A22",
+      "name": "Mard A22",
+      "hex": "#F4F57D"
+    },
+    {
+      "code": "A23",
+      "name": "Mard A23",
+      "hex": "#E6C9B7"
+    },
+    {
+      "code": "A24",
+      "name": "Mard A24",
+      "hex": "#F7F8A2"
+    },
+    {
+      "code": "A25",
+      "name": "Mard A25",
+      "hex": "#FFD67D"
+    },
+    {
+      "code": "A26",
+      "name": "Mard A26",
+      "hex": "#FFC830"
+    },
+    {
+      "code": "B1",
+      "name": "Mard B1",
+      "hex": "#E6EE31"
+    },
+    {
+      "code": "B2",
+      "name": "Mard B2",
+      "hex": "#63F347"
+    },
+    {
+      "code": "B3",
+      "name": "Mard B3",
+      "hex": "#9EF780"
+    },
+    {
+      "code": "B4",
+      "name": "Mard B4",
+      "hex": "#5DE035"
+    },
+    {
+      "code": "B5",
+      "name": "Mard B5",
+      "hex": "#35E352"
+    },
+    {
+      "code": "B6",
+      "name": "Mard B6",
+      "hex": "#65E2A6"
+    },
+    {
+      "code": "B7",
+      "name": "Mard B7",
+      "hex": "#3DAF80"
+    },
+    {
+      "code": "B8",
+      "name": "Mard B8",
+      "hex": "#1C9C4F"
+    },
+    {
+      "code": "B9",
+      "name": "Mard B9",
+      "hex": "#27523A"
+    },
+    {
+      "code": "B10",
+      "name": "Mard B10",
+      "hex": "#95D3C2"
+    },
+    {
+      "code": "B11",
+      "name": "Mard B11",
+      "hex": "#5D722A"
+    },
+    {
+      "code": "B12",
+      "name": "Mard B12",
+      "hex": "#166F41"
+    },
+    {
+      "code": "B13",
+      "name": "Mard B13",
+      "hex": "#CAEB7B"
+    },
+    {
+      "code": "B14",
+      "name": "Mard B14",
+      "hex": "#ADE946"
+    },
+    {
+      "code": "B15",
+      "name": "Mard B15",
+      "hex": "#2E5132"
+    },
+    {
+      "code": "B16",
+      "name": "Mard B16",
+      "hex": "#C5ED9C"
+    },
+    {
+      "code": "B17",
+      "name": "Mard B17",
+      "hex": "#9BB13A"
+    },
+    {
+      "code": "B18",
+      "name": "Mard B18",
+      "hex": "#E6EE49"
+    },
+    {
+      "code": "B19",
+      "name": "Mard B19",
+      "hex": "#24B88C"
+    },
+    {
+      "code": "B20",
+      "name": "Mard B20",
+      "hex": "#C2F0CC"
+    },
+    {
+      "code": "B21",
+      "name": "Mard B21",
+      "hex": "#156A6B"
+    },
+    {
+      "code": "B22",
+      "name": "Mard B22",
+      "hex": "#0B3C43"
+    },
+    {
+      "code": "B23",
+      "name": "Mard B23",
+      "hex": "#303A21"
+    },
+    {
+      "code": "B24",
+      "name": "Mard B24",
+      "hex": "#EEFCA5"
+    },
+    {
+      "code": "B25",
+      "name": "Mard B25",
+      "hex": "#4E846D"
+    },
+    {
+      "code": "B26",
+      "name": "Mard B26",
+      "hex": "#8D7A35"
+    },
+    {
+      "code": "B27",
+      "name": "Mard B27",
+      "hex": "#CCE1AF"
+    },
+    {
+      "code": "B28",
+      "name": "Mard B28",
+      "hex": "#9EE5B9"
+    },
+    {
+      "code": "B29",
+      "name": "Mard B29",
+      "hex": "#C5E254"
+    },
+    {
+      "code": "B30",
+      "name": "Mard B30",
+      "hex": "#E2FCB1"
+    },
+    {
+      "code": "B31",
+      "name": "Mard B31",
+      "hex": "#B0E792"
+    },
+    {
+      "code": "B32",
+      "name": "Mard B32",
+      "hex": "#9CAB5A"
+    },
+    {
+      "code": "C1",
+      "name": "Mard C1",
+      "hex": "#E8FFE7"
+    },
+    {
+      "code": "C2",
+      "name": "Mard C2",
+      "hex": "#A9F9FC"
+    },
+    {
+      "code": "C3",
+      "name": "Mard C3",
+      "hex": "#A0E2FB"
+    },
+    {
+      "code": "C4",
+      "name": "Mard C4",
+      "hex": "#41CCFF"
+    },
+    {
+      "code": "C5",
+      "name": "Mard C5",
+      "hex": "#01ACEB"
+    },
+    {
+      "code": "C6",
+      "name": "Mard C6",
+      "hex": "#50AAF0"
+    },
+    {
+      "code": "C7",
+      "name": "Mard C7",
+      "hex": "#3677D2"
+    },
+    {
+      "code": "C8",
+      "name": "Mard C8",
+      "hex": "#0F54C0"
+    },
+    {
+      "code": "C9",
+      "name": "Mard C9",
+      "hex": "#324BCA"
+    },
+    {
+      "code": "C10",
+      "name": "Mard C10",
+      "hex": "#3EBCE2"
+    },
+    {
+      "code": "C11",
+      "name": "Mard C11",
+      "hex": "#28DDDE"
+    },
+    {
+      "code": "C12",
+      "name": "Mard C12",
+      "hex": "#1C334D"
+    },
+    {
+      "code": "C13",
+      "name": "Mard C13",
+      "hex": "#CDE8FF"
+    },
+    {
+      "code": "C14",
+      "name": "Mard C14",
+      "hex": "#D5FDFF"
+    },
+    {
+      "code": "C15",
+      "name": "Mard C15",
+      "hex": "#22C4C6"
+    },
+    {
+      "code": "C16",
+      "name": "Mard C16",
+      "hex": "#1557A8"
+    },
+    {
+      "code": "C17",
+      "name": "Mard C17",
+      "hex": "#04D1F6"
+    },
+    {
+      "code": "C18",
+      "name": "Mard C18",
+      "hex": "#1D3344"
+    },
+    {
+      "code": "C19",
+      "name": "Mard C19",
+      "hex": "#1887A2"
+    },
+    {
+      "code": "C20",
+      "name": "Mard C20",
+      "hex": "#176DAF"
+    },
+    {
+      "code": "C21",
+      "name": "Mard C21",
+      "hex": "#BEDDFF"
+    },
+    {
+      "code": "C22",
+      "name": "Mard C22",
+      "hex": "#67B4BE"
+    },
+    {
+      "code": "C23",
+      "name": "Mard C23",
+      "hex": "#C8E2FF"
+    },
+    {
+      "code": "C24",
+      "name": "Mard C24",
+      "hex": "#7CC4FF"
+    },
+    {
+      "code": "C25",
+      "name": "Mard C25",
+      "hex": "#A9E5E5"
+    },
+    {
+      "code": "C26",
+      "name": "Mard C26",
+      "hex": "#3CAED8"
+    },
+    {
+      "code": "C27",
+      "name": "Mard C27",
+      "hex": "#D3DFFA"
+    },
+    {
+      "code": "C28",
+      "name": "Mard C28",
+      "hex": "#BBCFED"
+    },
+    {
+      "code": "C29",
+      "name": "Mard C29",
+      "hex": "#34488E"
+    },
+    {
+      "code": "D1",
+      "name": "Mard D1",
+      "hex": "#AEB4F2"
+    },
+    {
+      "code": "D2",
+      "name": "Mard D2",
+      "hex": "#858EDD"
+    },
+    {
+      "code": "D3",
+      "name": "Mard D3",
+      "hex": "#2F54AF"
+    },
+    {
+      "code": "D4",
+      "name": "Mard D4",
+      "hex": "#182A84"
+    },
+    {
+      "code": "D5",
+      "name": "Mard D5",
+      "hex": "#B843C5"
+    },
+    {
+      "code": "D6",
+      "name": "Mard D6",
+      "hex": "#AC7BDE"
+    },
+    {
+      "code": "D7",
+      "name": "Mard D7",
+      "hex": "#8854B3"
+    },
+    {
+      "code": "D8",
+      "name": "Mard D8",
+      "hex": "#E2D3FF"
+    },
+    {
+      "code": "D9",
+      "name": "Mard D9",
+      "hex": "#D5B9F8"
+    },
+    {
+      "code": "D10",
+      "name": "Mard D10",
+      "hex": "#361851"
+    },
+    {
+      "code": "D11",
+      "name": "Mard D11",
+      "hex": "#B9BAE1"
+    },
+    {
+      "code": "D12",
+      "name": "Mard D12",
+      "hex": "#DE9AD4"
+    },
+    {
+      "code": "D13",
+      "name": "Mard D13",
+      "hex": "#B90095"
+    },
+    {
+      "code": "D14",
+      "name": "Mard D14",
+      "hex": "#8B279B"
+    },
+    {
+      "code": "D15",
+      "name": "Mard D15",
+      "hex": "#2F1F90"
+    },
+    {
+      "code": "D16",
+      "name": "Mard D16",
+      "hex": "#E3E1EE"
+    },
+    {
+      "code": "D17",
+      "name": "Mard D17",
+      "hex": "#C4D4F6"
+    },
+    {
+      "code": "D18",
+      "name": "Mard D18",
+      "hex": "#A45EC7"
+    },
+    {
+      "code": "D19",
+      "name": "Mard D19",
+      "hex": "#D8C3D7"
+    },
+    {
+      "code": "D20",
+      "name": "Mard D20",
+      "hex": "#9C32B2"
+    },
+    {
+      "code": "D21",
+      "name": "Mard D21",
+      "hex": "#9A009B"
+    },
+    {
+      "code": "D22",
+      "name": "Mard D22",
+      "hex": "#333A95"
+    },
+    {
+      "code": "D23",
+      "name": "Mard D23",
+      "hex": "#EBDAFC"
+    },
+    {
+      "code": "D24",
+      "name": "Mard D24",
+      "hex": "#7786E5"
+    },
+    {
+      "code": "D25",
+      "name": "Mard D25",
+      "hex": "#494FC7"
+    },
+    {
+      "code": "D26",
+      "name": "Mard D26",
+      "hex": "#DFC2F8"
+    },
+    {
+      "code": "E1",
+      "name": "Mard E1",
+      "hex": "#FDD3CC"
+    },
+    {
+      "code": "E2",
+      "name": "Mard E2",
+      "hex": "#FEC0DF"
+    },
+    {
+      "code": "E3",
+      "name": "Mard E3",
+      "hex": "#FFB7E7"
+    },
+    {
+      "code": "E4",
+      "name": "Mard E4",
+      "hex": "#E8649E"
+    },
+    {
+      "code": "E5",
+      "name": "Mard E5",
+      "hex": "#F551A2"
+    },
+    {
+      "code": "E6",
+      "name": "Mard E6",
+      "hex": "#F13D74"
+    },
+    {
+      "code": "E7",
+      "name": "Mard E7",
+      "hex": "#C63478"
+    },
+    {
+      "code": "E8",
+      "name": "Mard E8",
+      "hex": "#FFDBE9"
+    },
+    {
+      "code": "E9",
+      "name": "Mard E9",
+      "hex": "#E970CC"
+    },
+    {
+      "code": "E10",
+      "name": "Mard E10",
+      "hex": "#D33793"
+    },
+    {
+      "code": "E11",
+      "name": "Mard E11",
+      "hex": "#FCDDD2"
+    },
+    {
+      "code": "E12",
+      "name": "Mard E12",
+      "hex": "#F78FC3"
+    },
+    {
+      "code": "E13",
+      "name": "Mard E13",
+      "hex": "#B5006D"
+    },
+    {
+      "code": "E14",
+      "name": "Mard E14",
+      "hex": "#FFD1BA"
+    },
+    {
+      "code": "E15",
+      "name": "Mard E15",
+      "hex": "#F8C7C9"
+    },
+    {
+      "code": "E16",
+      "name": "Mard E16",
+      "hex": "#FFF3EB"
+    },
+    {
+      "code": "E17",
+      "name": "Mard E17",
+      "hex": "#FFE2EA"
+    },
+    {
+      "code": "E18",
+      "name": "Mard E18",
+      "hex": "#FFC7DB"
+    },
+    {
+      "code": "E19",
+      "name": "Mard E19",
+      "hex": "#FEBAD5"
+    },
+    {
+      "code": "E20",
+      "name": "Mard E20",
+      "hex": "#D8C7D1"
+    },
+    {
+      "code": "E21",
+      "name": "Mard E21",
+      "hex": "#BD9DA1"
+    },
+    {
+      "code": "E22",
+      "name": "Mard E22",
+      "hex": "#B785A1"
+    },
+    {
+      "code": "E23",
+      "name": "Mard E23",
+      "hex": "#937A8D"
+    },
+    {
+      "code": "E24",
+      "name": "Mard E24",
+      "hex": "#E1BCE8"
+    },
+    {
+      "code": "F1",
+      "name": "Mard F1",
+      "hex": "#FD957B"
+    },
+    {
+      "code": "F2",
+      "name": "Mard F2",
+      "hex": "#FC3D46"
+    },
+    {
+      "code": "F3",
+      "name": "Mard F3",
+      "hex": "#F74941"
+    },
+    {
+      "code": "F4",
+      "name": "Mard F4",
+      "hex": "#FC283C"
+    },
+    {
+      "code": "F5",
+      "name": "Mard F5",
+      "hex": "#E7002F"
+    },
+    {
+      "code": "F6",
+      "name": "Mard F6",
+      "hex": "#943630"
+    },
+    {
+      "code": "F7",
+      "name": "Mard F7",
+      "hex": "#971937"
+    },
+    {
+      "code": "F8",
+      "name": "Mard F8",
+      "hex": "#BC0028"
+    },
+    {
+      "code": "F9",
+      "name": "Mard F9",
+      "hex": "#E2677A"
+    },
+    {
+      "code": "F10",
+      "name": "Mard F10",
+      "hex": "#8A4526"
+    },
+    {
+      "code": "F11",
+      "name": "Mard F11",
+      "hex": "#5A2121"
+    },
+    {
+      "code": "F12",
+      "name": "Mard F12",
+      "hex": "#FD4E6A"
+    },
+    {
+      "code": "F13",
+      "name": "Mard F13",
+      "hex": "#F35744"
+    },
+    {
+      "code": "F14",
+      "name": "Mard F14",
+      "hex": "#FFA9AD"
+    },
+    {
+      "code": "F15",
+      "name": "Mard F15",
+      "hex": "#D30022"
+    },
+    {
+      "code": "F16",
+      "name": "Mard F16",
+      "hex": "#FEC2A6"
+    },
+    {
+      "code": "F17",
+      "name": "Mard F17",
+      "hex": "#E69C79"
+    },
+    {
+      "code": "F18",
+      "name": "Mard F18",
+      "hex": "#D37C46"
+    },
+    {
+      "code": "F19",
+      "name": "Mard F19",
+      "hex": "#C1444A"
+    },
+    {
+      "code": "F20",
+      "name": "Mard F20",
+      "hex": "#CD9391"
+    },
+    {
+      "code": "F21",
+      "name": "Mard F21",
+      "hex": "#F7B4C6"
+    },
+    {
+      "code": "F22",
+      "name": "Mard F22",
+      "hex": "#FDC0D0"
+    },
+    {
+      "code": "F23",
+      "name": "Mard F23",
+      "hex": "#F67E66"
+    },
+    {
+      "code": "F24",
+      "name": "Mard F24",
+      "hex": "#E698AA"
+    },
+    {
+      "code": "F25",
+      "name": "Mard F25",
+      "hex": "#E54B4F"
+    },
+    {
+      "code": "G1",
+      "name": "Mard G1",
+      "hex": "#FFE2CE"
+    },
+    {
+      "code": "G2",
+      "name": "Mard G2",
+      "hex": "#FFC4AA"
+    },
+    {
+      "code": "G3",
+      "name": "Mard G3",
+      "hex": "#F4C3A5"
+    },
+    {
+      "code": "G4",
+      "name": "Mard G4",
+      "hex": "#E1B383"
+    },
+    {
+      "code": "G5",
+      "name": "Mard G5",
+      "hex": "#EDB045"
+    },
+    {
+      "code": "G6",
+      "name": "Mard G6",
+      "hex": "#E99C17"
+    },
+    {
+      "code": "G7",
+      "name": "Mard G7",
+      "hex": "#9D5B3E"
+    },
+    {
+      "code": "G8",
+      "name": "Mard G8",
+      "hex": "#753832"
+    },
+    {
+      "code": "G9",
+      "name": "Mard G9",
+      "hex": "#E6B483"
+    },
+    {
+      "code": "G10",
+      "name": "Mard G10",
+      "hex": "#D98C39"
+    },
+    {
+      "code": "G11",
+      "name": "Mard G11",
+      "hex": "#E0C593"
+    },
+    {
+      "code": "G12",
+      "name": "Mard G12",
+      "hex": "#FFC890"
+    },
+    {
+      "code": "G13",
+      "name": "Mard G13",
+      "hex": "#B7714A"
+    },
+    {
+      "code": "G14",
+      "name": "Mard G14",
+      "hex": "#8D614C"
+    },
+    {
+      "code": "G15",
+      "name": "Mard G15",
+      "hex": "#FCF9E0"
+    },
+    {
+      "code": "G16",
+      "name": "Mard G16",
+      "hex": "#F2D9BA"
+    },
+    {
+      "code": "G17",
+      "name": "Mard G17",
+      "hex": "#78524B"
+    },
+    {
+      "code": "G18",
+      "name": "Mard G18",
+      "hex": "#FFE4CC"
+    },
+    {
+      "code": "G19",
+      "name": "Mard G19",
+      "hex": "#E07935"
+    },
+    {
+      "code": "G20",
+      "name": "Mard G20",
+      "hex": "#A94023"
+    },
+    {
+      "code": "G21",
+      "name": "Mard G21",
+      "hex": "#B88558"
+    },
+    {
+      "code": "H1",
+      "name": "Mard H1",
+      "hex": "#FDFBFF"
+    },
+    {
+      "code": "H2",
+      "name": "Mard H2",
+      "hex": "#FEFFFF"
+    },
+    {
+      "code": "H3",
+      "name": "Mard H3",
+      "hex": "#B6B1BA"
+    },
+    {
+      "code": "H4",
+      "name": "Mard H4",
+      "hex": "#89858C"
+    },
+    {
+      "code": "H5",
+      "name": "Mard H5",
+      "hex": "#48464E"
+    },
+    {
+      "code": "H6",
+      "name": "Mard H6",
+      "hex": "#2F2B2F"
+    },
+    {
+      "code": "H7",
+      "name": "Mard H7",
+      "hex": "#000000"
+    },
+    {
+      "code": "H8",
+      "name": "Mard H8",
+      "hex": "#E7D6DB"
+    },
+    {
+      "code": "H9",
+      "name": "Mard H9",
+      "hex": "#EDEDED"
+    },
+    {
+      "code": "H10",
+      "name": "Mard H10",
+      "hex": "#EEE9EA"
+    },
+    {
+      "code": "H11",
+      "name": "Mard H11",
+      "hex": "#CECDD5"
+    },
+    {
+      "code": "H12",
+      "name": "Mard H12",
+      "hex": "#FFF5ED"
+    },
+    {
+      "code": "H13",
+      "name": "Mard H13",
+      "hex": "#F5ECD2"
+    },
+    {
+      "code": "H14",
+      "name": "Mard H14",
+      "hex": "#CFD7D3"
+    },
+    {
+      "code": "H15",
+      "name": "Mard H15",
+      "hex": "#98A6A8"
+    },
+    {
+      "code": "H16",
+      "name": "Mard H16",
+      "hex": "#1D1414"
+    },
+    {
+      "code": "H17",
+      "name": "Mard H17",
+      "hex": "#F1EDED"
+    },
+    {
+      "code": "H18",
+      "name": "Mard H18",
+      "hex": "#FFFDF0"
+    },
+    {
+      "code": "H19",
+      "name": "Mard H19",
+      "hex": "#F6EFE2"
+    },
+    {
+      "code": "H20",
+      "name": "Mard H20",
+      "hex": "#949FA3"
+    },
+    {
+      "code": "H21",
+      "name": "Mard H21",
+      "hex": "#FFFBE1"
+    },
+    {
+      "code": "H22",
+      "name": "Mard H22",
+      "hex": "#CACAD4"
+    },
+    {
+      "code": "H23",
+      "name": "Mard H23",
+      "hex": "#9A9D94"
+    },
+    {
+      "code": "M1",
+      "name": "Mard M1",
+      "hex": "#BCC6B8"
+    },
+    {
+      "code": "M2",
+      "name": "Mard M2",
+      "hex": "#8AA386"
+    },
+    {
+      "code": "M3",
+      "name": "Mard M3",
+      "hex": "#697D80"
+    },
+    {
+      "code": "M4",
+      "name": "Mard M4",
+      "hex": "#E3D2BC"
+    },
+    {
+      "code": "M5",
+      "name": "Mard M5",
+      "hex": "#D0CCAA"
+    },
+    {
+      "code": "M6",
+      "name": "Mard M6",
+      "hex": "#B0A782"
+    },
+    {
+      "code": "M7",
+      "name": "Mard M7",
+      "hex": "#B4A497"
+    },
+    {
+      "code": "M8",
+      "name": "Mard M8",
+      "hex": "#B38281"
+    },
+    {
+      "code": "M9",
+      "name": "Mard M9",
+      "hex": "#A58767"
+    },
+    {
+      "code": "M10",
+      "name": "Mard M10",
+      "hex": "#C5B2BC"
+    },
+    {
+      "code": "M11",
+      "name": "Mard M11",
+      "hex": "#9F7594"
+    },
+    {
+      "code": "M12",
+      "name": "Mard M12",
+      "hex": "#644749"
+    },
+    {
+      "code": "M13",
+      "name": "Mard M13",
+      "hex": "#D19066"
+    },
+    {
+      "code": "M14",
+      "name": "Mard M14",
+      "hex": "#C77362"
+    },
+    {
+      "code": "M15",
+      "name": "Mard M15",
+      "hex": "#757D78"
+    }
+  ]
+}

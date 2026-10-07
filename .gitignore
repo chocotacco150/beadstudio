@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.sites-runtime/
+artifacts/
+*.log
+*.tsbuildinfo
