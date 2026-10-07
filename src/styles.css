@@ -856,6 +856,27 @@ small {
   flex-direction: column;
   overflow: hidden;
 }
+.palette-scroll {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.palette-panel > .panel-title,
+.palette-panel > .palette-bottom {
+  flex-shrink: 0;
+}
+@media (max-height: 740px) {
+  .palette-scroll {
+    display: block;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  .palette-scroll .color-list {
+    overflow: visible;
+  }
+}
 .palette-info {
   padding: 18px 18px 15px;
   display: flex;
@@ -883,6 +904,93 @@ small {
   padding: 0 18px;
   border-bottom: 1px solid var(--line);
   gap: 22px;
+}
+.used-code-overview {
+  margin: 0 18px 16px;
+  padding: 12px 10px;
+  border: 1px solid #dceae5;
+  border-radius: 7px;
+  background: #f8fcfa;
+  flex-shrink: 0;
+}
+.used-code-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+.used-code-heading h3 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #324b54;
+}
+.used-code-heading h3 span {
+  margin-left: 3px;
+  font-size: 11px;
+  font-weight: 400;
+  color: #5d727d;
+  white-space: nowrap;
+}
+.copy-code-button {
+  padding: 3px 0;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--teal);
+  white-space: nowrap;
+}
+.used-code-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.used-code-chip {
+  min-height: 23px;
+  padding: 3px 4px;
+  gap: 3px;
+  border: 1px solid #e1e9e6;
+  border-radius: 4px;
+  background: #fff;
+  color: #324b54;
+}
+.used-code-chip i {
+  width: 5px;
+  height: 10px;
+  border-radius: 2px;
+  border: 1px solid #1933411a;
+  flex-shrink: 0;
+}
+.used-code-chip code {
+  font-family: Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.used-code-chip.active {
+  border-color: #7fb7ab;
+  background: #e5f4ed;
+  color: #155f56;
+}
+.used-code-empty {
+  font-size: 12px;
+  color: #5d727d;
+  line-height: 1.6;
+  margin: 0;
+}
+@media (max-height: 740px) {
+  .used-code-list {
+    max-height: 80px;
+  }
+  .used-code-overview {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+  }
 }
 .palette-tabs button {
   font-size: 12px;

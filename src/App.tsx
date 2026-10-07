@@ -4,6 +4,7 @@ import {
   Brush,
   Check,
   ChevronDown,
+  Copy,
   Crop as CropIcon,
   Eraser,
   FileImage,
@@ -143,6 +144,13 @@ export default function App() {
     [pattern],
   );
   const editPalette = pattern?.palette ?? palette;
+  const requiredColors = useMemo(
+    () =>
+      [...stats.used].sort((a, b) =>
+        a.code.localeCompare(b.code, "en", { numeric: true }),
+      ),
+    [stats.used],
+  );
   const selectedColor =
     editPalette.colors.find((c) => c.code === selected) ??
     editPalette.colors[0];
@@ -387,6 +395,16 @@ export default function App() {
     setSelected(code);
     setHighlight((h) => (h === code ? null : code));
     setTool("brush");
+  }
+  async function copyRequiredCodes() {
+    try {
+      await navigator.clipboard.writeText(
+        `${editPalette.name}\n所需色号（${requiredColors.length} 种）：${requiredColors.map((c) => c.code).join("、")}`,
+      );
+      notify("已复制本图纸的全部所需色号。");
+    } catch {
+      notify("复制失败，请允许浏览器访问剪贴板后重试。", true);
+    }
   }
   async function handleExport() {
     if (!pattern || busy) return;
@@ -1069,87 +1087,130 @@ export default function App() {
             <h2>色板与用量</h2>
             <span>02</span>
           </div>
-          <div className="palette-info">
-            <strong>{editPalette.name}</strong>
-            <span>
-              {editPalette.source
-                ? "第三方色号对照 · 221 色"
-                : "自定义 / 示例色板"}
-              {editPalette.source && (
-                <a
-                  href={editPalette.source}
-                  target="_blank"
-                  rel="noreferrer"
-                  title="查看色号来源"
+          <div className="palette-scroll">
+            <div className="palette-info">
+              <strong>{editPalette.name}</strong>
+              <span>
+                {editPalette.source
+                  ? "第三方色号对照 · 221 色"
+                  : "自定义 / 示例色板"}
+                {editPalette.source && (
+                  <a
+                    href={editPalette.source}
+                    target="_blank"
+                    rel="noreferrer"
+                    title="查看色号来源"
+                  >
+                    <Info size={14} />
+                  </a>
+                )}
+              </span>
+            </div>
+            <section className="used-code-overview" aria-label="本图纸所需色号">
+              <div className="used-code-heading">
+                <h3>
+                  本图纸所需色号 <span>{requiredColors.length} 种</span>
+                </h3>
+                <button
+                  className="copy-code-button"
+                  title="复制全部所需色号"
+                  aria-label="复制全部所需色号"
+                  disabled={busy || !requiredColors.length}
+                  onClick={copyRequiredCodes}
                 >
-                  <Info size={14} />
-                </a>
-              )}
-            </span>
-          </div>
-          <div className="palette-tabs">
-            <button
-              className={paletteTab === "used" ? "active" : ""}
-              onClick={() => setPaletteTab("used")}
-            >
-              已用颜色 <span>{stats.colorCount}</span>
-            </button>
-            <button
-              className={paletteTab === "all" ? "active" : ""}
-              onClick={() => setPaletteTab("all")}
-            >
-              全部色板
-            </button>
-          </div>
-          <input
-            className="color-search"
-            aria-label="查找颜色"
-            placeholder="查找色号、名称或 HEX"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <div className="color-list-head">
-            <span>颜色 / 编号</span>
-            <span>用量（颗）</span>
-          </div>
-          <div className="color-list">
-            {visibleColors.map((c) => (
-              <button
-                className={`color-row ${selected === c.code ? "selected" : ""}`}
-                key={c.code}
-                disabled={busy}
-                onClick={() => selectColor(c.code)}
-                title={`${c.name} ${c.hex}，点击选择并高亮`}
-              >
-                <span className="color-swatch" style={{ background: c.hex }}>
-                  {selected === c.code && (
-                    <Check
-                      size={16}
-                      style={{
-                        color:
-                          parseInt(c.hex.slice(1, 3), 16) > 150
-                            ? "#173c43"
-                            : "white",
-                      }}
-                    />
-                  )}
-                </span>
-                <span className="color-name">
-                  <strong>{c.code}</strong>
-                  <small>{c.hex}</small>
-                </span>
-                <span className="color-count">{c.count.toLocaleString()}</span>
-              </button>
-            ))}
-            {!visibleColors.length && (
-              <div className="empty-colors">
-                {search
-                  ? "没有找到匹配颜色"
-                  : busy
-                    ? "正在统计颜色…"
-                    : "图纸为空白，切换到全部色板开始绘制。"}
+                  <Copy size={13} />
+                  复制
+                </button>
               </div>
-            )}
+              {requiredColors.length ? (
+                <div className="used-code-list">
+                  {requiredColors.map((c) => (
+                    <button
+                      key={c.code}
+                      className={`used-code-chip ${highlight === c.code ? "active" : ""}`}
+                      aria-label={`高亮色号 ${c.code}，需要 ${c.count} 颗`}
+                      aria-pressed={highlight === c.code}
+                      title={`${c.code} · ${c.name} · ${c.count.toLocaleString()} 颗`}
+                      disabled={busy}
+                      onClick={() => selectColor(c.code)}
+                    >
+                      <i style={{ background: c.hex }} />
+                      <code>{c.code}</code>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p className="used-code-empty">
+                  {busy ? "正在统计所需色号…" : "图纸暂无拼豆，无需准备色号。"}
+                </p>
+              )}
+            </section>
+            <div className="palette-tabs">
+              <button
+                className={paletteTab === "used" ? "active" : ""}
+                onClick={() => setPaletteTab("used")}
+              >
+                已用颜色 <span>{stats.colorCount}</span>
+              </button>
+              <button
+                className={paletteTab === "all" ? "active" : ""}
+                onClick={() => setPaletteTab("all")}
+              >
+                全部色板
+              </button>
+            </div>
+            <input
+              className="color-search"
+              aria-label="查找颜色"
+              placeholder="查找色号、名称或 HEX"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <div className="color-list-head">
+              <span>颜色 / 编号</span>
+              <span>用量（颗）</span>
+            </div>
+            <div className="color-list">
+              {visibleColors.map((c) => (
+                <button
+                  className={`color-row ${selected === c.code ? "selected" : ""}`}
+                  key={c.code}
+                  disabled={busy}
+                  onClick={() => selectColor(c.code)}
+                  title={`${c.name} ${c.hex}，点击选择并高亮`}
+                >
+                  <span className="color-swatch" style={{ background: c.hex }}>
+                    {selected === c.code && (
+                      <Check
+                        size={16}
+                        style={{
+                          color:
+                            parseInt(c.hex.slice(1, 3), 16) > 150
+                              ? "#173c43"
+                              : "white",
+                        }}
+                      />
+                    )}
+                  </span>
+                  <span className="color-name">
+                    <strong>{c.code}</strong>
+                    <small>{c.hex}</small>
+                  </span>
+                  <span className="color-count">
+                    {c.count.toLocaleString()}
+                  </span>
+                </button>
+              ))}
+              {!visibleColors.length && (
+                <div className="empty-colors">
+                  {search
+                    ? "没有找到匹配颜色"
+                    : busy
+                      ? "正在统计颜色…"
+                      : "图纸为空白，切换到全部色板开始绘制。"}
+                </div>
+              )}
+            </div>
           </div>
           <div className="palette-bottom">
             <p>
@@ -1178,7 +1239,9 @@ export default function App() {
                 导出色板
               </button>
             </div>
-            <small>{editPalette.description}</small>
+            {editPalette.description && (
+              <small tabIndex={0}>{editPalette.description}</small>
+            )}
           </div>
         </aside>
       </main>
