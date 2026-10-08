@@ -1340,6 +1340,9 @@ small {
 .pdf-settings select {
   font-size: 13px;
 }
+.pdf-settings label + label {
+  margin-top: 12px;
+}
 .pdf-settings p {
   font-size: 12px;
   color: #5d727d;

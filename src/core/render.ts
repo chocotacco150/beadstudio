@@ -13,7 +13,10 @@ export interface RenderOptions extends DisplayOptions {
   fineGrid?: boolean;
   pixelSnap?: { scale: number; x: number; y: number };
 }
-export function drawPattern(
+// The factory has no module-level runtime dependencies. The HTML export embeds
+// this exact renderer, keeping its cells, coordinates and grid identical.
+export function createPatternRenderer(contrast: (hex: string) => string) {
+  return function drawPattern(
   ctx: CanvasRenderingContext2D,
   p: Pattern,
   o: RenderOptions,
@@ -76,7 +79,7 @@ export function drawPattern(
         fillCell(x, y);
       }
       if (o.codes && c) {
-        ctx.fillStyle = textColor(c.hex);
+        ctx.fillStyle = contrast(c.hex);
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.font = `500 ${Math.max(3, Math.min(s * 0.32, (s * 0.88) / (c.code.length * 0.6)))}px ui-monospace,Consolas,monospace`;
@@ -130,7 +133,9 @@ export function drawPattern(
       }
   }
   ctx.restore();
+  };
 }
+export const drawPattern = createPatternRenderer(textColor);
 export function patternCanvas(p: Pattern, o: RenderOptions) {
   const g = o.coordinates ? (o.gutter ?? o.cellSize * 1.8) : 0;
   const canvas = document.createElement("canvas");

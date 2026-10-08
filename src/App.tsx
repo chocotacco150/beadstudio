@@ -56,6 +56,7 @@ import {
   exportChartPNG,
   exportPatternPNG,
   exportPDF,
+  exportShareHTML,
   filename,
   pdfLayout,
 } from "./core/export";
@@ -120,10 +121,11 @@ export default function App() {
     ),
     [hover, setHover] = useState("每格一颗拼豆"),
     [dragging, setDragging] = useState(false);
-  const [exportType, setExportType] = useState<"pattern" | "chart" | "pdf">(
+  const [exportType, setExportType] = useState<"pattern" | "chart" | "pdf" | "html">(
       "chart",
     ),
     [beadMm, setBeadMm] = useState(5),
+    [pdfMode, setPdfMode] = useState<"single" | "a4">("single"),
     [replaceFrom, setReplaceFrom] = useState(""),
     [replaceTo, setReplaceTo] = useState("");
   const imageInput = useRef<HTMLInputElement>(null),
@@ -415,7 +417,8 @@ export default function App() {
       await new Promise((r) => setTimeout(r, 40));
       if (exportType === "pattern") await exportPatternPNG(pattern);
       else if (exportType === "chart") await exportChartPNG(pattern);
-      else await exportPDF(pattern, beadMm, setProgress);
+      else if (exportType === "html") exportShareHTML(pattern);
+      else await exportPDF(pattern, beadMm, setProgress, pdfMode);
       setDialog(null);
       notify("导出完成，文件已下载。");
     } catch (e) {
@@ -1329,8 +1332,14 @@ export default function App() {
               {
                 key: "pdf",
                 icon: FileText,
-                label: "A4 打印 PDF",
-                desc: "分多页打印，附用量清单、页码和拼接位置",
+                label: "PDF 图纸",
+                desc: "整张图纸单页查看，也可选择 A4 分页打印",
+              },
+              {
+                key: "html",
+                icon: FileText,
+                label: "分享 HTML · 离线图纸",
+                desc: "单个文件，含图纸、色号与用量，浏览器直接打开",
               },
             ].map((o) => (
               <label
@@ -1356,6 +1365,14 @@ export default function App() {
           {exportType === "pdf" && (
             <div className="pdf-settings">
               <label>
+                PDF 排版
+                <select value={pdfMode} disabled={busy} onChange={(e) => setPdfMode(e.target.value as "single" | "a4")}>
+                  <option value="single">整张图纸 · 单页</option>
+                  <option value="a4">A4 分页 · 实物大小打印</option>
+                </select>
+              </label>
+              {pdfMode === "a4" ? <>
+              <label>
                 打印每格尺寸
                 <select
                   value={beadMm}
@@ -1374,6 +1391,7 @@ export default function App() {
                 <br />
                 打印请选择「实际大小 / 100%」。
               </p>
+              </> : <p>图纸与全部用量放在同一页，页面比例自动适配图纸。需要按实物大小打印时，可选择 A4 分页。</p>}
             </div>
           )}
           {message?.error && (

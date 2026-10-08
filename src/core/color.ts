@@ -25,6 +25,7 @@ export function distance(a: Triple, b: Triple) {
   return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
 }
 export function textColor(hex: string) {
-  const [r, g, b] = hexToRgb(hex);
+  // Self-contained so the same contrast calculation can travel in the HTML viewer.
+  const [r, g, b] = [1, 3, 5].map((start) => parseInt(hex.slice(start, start + 2), 16));
   return 0.2126 * r + 0.7152 * g + 0.0722 * b > 145 ? "#162d32" : "#ffffff";
 }

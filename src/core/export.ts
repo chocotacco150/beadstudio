@@ -1,6 +1,8 @@
 import { getStats } from "./pattern";
 import { patternCanvas } from "./render";
 import type { Pattern } from "./types";
+import { createShareHTML } from "./share";
+import { createSinglePagePDF } from "./single-page-pdf";
 export function filename(name: string) {
   return name.replace(/[\\/:*?"<>|]/g, "_").slice(0, 80) || "我的拼豆";
 }
@@ -20,6 +22,12 @@ export function downloadJSON(data: unknown, name: string) {
       type: "application/json;charset=utf-8",
     }),
     name,
+  );
+}
+export function exportShareHTML(pattern: Pattern) {
+  downloadBlob(
+    new Blob([createShareHTML(pattern)], { type: "text/html;charset=utf-8" }),
+    `${filename(pattern.name)}-分享图纸.html`,
   );
 }
 export async function downloadPNG(canvas: HTMLCanvasElement, name: string) {
@@ -152,7 +160,12 @@ export async function exportPDF(
   p: Pattern,
   beadMm: number,
   onProgress: (n: number) => void,
+  mode: "single" | "a4" = "single",
 ) {
+  if (mode === "single") {
+    downloadBlob(await createSinglePagePDF(p, onProgress), `${filename(p.name)}-单页图纸.pdf`);
+    return;
+  }
   const { jsPDF } = await import("jspdf");
   const pdf = new jsPDF({
     orientation: "portrait",
