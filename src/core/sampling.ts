@@ -41,11 +41,11 @@ export function convertImage(
     settings.keepRatio,
   );
   const canvas = document.createElement("canvas");
-  const scale = settings.mode === "photo" ? 3 : 1;
+  const scale = settings.mode === "pixel" ? 1 : 3;
   canvas.width = width * scale;
   canvas.height = height * scale;
   const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
-  ctx.imageSmoothingEnabled = settings.mode === "photo";
+  ctx.imageSmoothingEnabled = settings.mode !== "pixel";
   ctx.imageSmoothingQuality = "high";
   ctx.drawImage(
     image,

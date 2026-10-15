@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Scan, ZoomIn, ZoomOut } from "lucide-react";
 import { drawPattern } from "../core/render";
+import { floodFill } from "../core/editing";
 import type { DisplayOptions, Pattern, Tool } from "../core/types";
 const CELL = 16,
   GUTTER = 28;
@@ -164,6 +165,7 @@ export function PatternCanvas({
           aria-label="拼豆图纸编辑画布"
           onPointerDown={(e) => {
             if (disabled) return;
+            if (e.button !== 0 && e.button !== 1) return;
             e.currentTarget.setPointerCapture(e.pointerId);
             if (tool === "pan" || e.button === 1) {
               gesture.current = {
@@ -181,6 +183,11 @@ export function PatternCanvas({
             if (tool === "picker") {
               const c = pattern.cells[index];
               if (c) onPick(c);
+              return;
+            }
+            if (tool === "fill" || tool === "clear") {
+              const next = floodFill(pattern, index, tool === "clear" ? null : color);
+              if (next !== pattern) onCommit(next);
               return;
             }
             gesture.current = {

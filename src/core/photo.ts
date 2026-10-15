@@ -127,7 +127,7 @@ export function preparePhoto(
     }
   }
   progress(14);
-  if (settings.mode === "photo" && settings.smoothing > 0) {
+  if (settings.mode !== "pixel" && settings.smoothing > 0) {
     // Edge-aware local averaging suppresses texture speckles while preserving
     // sharp subject boundaries. Two passes are useful for busy backgrounds.
     for (let pass = 0; pass < settings.smoothing; pass++) {
@@ -171,15 +171,41 @@ export function preparePhoto(
     }
   }
   const fill = settings.background ? hexToRgb(settings.background) : null;
-  const contrast = settings.mode === "photo" ? 1 + settings.contrast / 100 : 1;
+  const contrast = settings.mode !== "pixel" ? 1 + settings.contrast / 100 : 1;
+  const brightness = settings.mode !== "pixel" ? (settings.brightness ?? 0) * 2.55 : 0;
+  const saturation = settings.mode !== "pixel" ? (settings.saturation ?? 100) / 100 : 1;
   for (let i = 0; i < output.length; i += 4) {
+    const luminance = output[i] * 0.2126 + output[i + 1] * 0.7152 + output[i + 2] * 0.0722;
     for (let c = 0; c < 3; c++)
-      output[i + c] = (output[i + c] - 128) * contrast + 128;
+      output[i + c] = (luminance + (output[i + c] - luminance) * saturation - 128) * contrast + 128 + brightness;
     if (fill) {
       const a = output[i + 3] / 255;
       for (let c = 0; c < 3; c++)
         output[i + c] = output[i + c] * a + fill[c] * (1 - a);
       output[i + 3] = 255;
+    }
+  }
+  if (settings.mode === "lineart") {
+    // Otsu's threshold adapts to paper brightness. Transparent cells do not
+    // contribute to the histogram or become beads.
+    const histogram = new Uint32Array(256);
+    let count = 0, sum = 0;
+    for (let i = 0; i < output.length; i += 4) {
+      if (output[i + 3] < 128) continue;
+      const v = Math.round(output[i] * .2126 + output[i + 1] * .7152 + output[i + 2] * .0722);
+      histogram[v]++; count++; sum += v;
+    }
+    let leftCount = 0, leftSum = 0, best = -1, threshold = 127;
+    for (let t = 0; t < 255; t++) {
+      leftCount += histogram[t]; leftSum += histogram[t] * t;
+      const rightCount = count - leftCount;
+      if (!leftCount || !rightCount) continue;
+      const variance = leftCount * rightCount * (leftSum / leftCount - (sum - leftSum) / rightCount) ** 2;
+      if (variance > best) { best = variance; threshold = t; }
+    }
+    for (let i = 0; i < output.length; i += 4) {
+      const value = output[i] * .2126 + output[i + 1] * .7152 + output[i + 2] * .0722 <= threshold ? 0 : 255;
+      output[i] = output[i + 1] = output[i + 2] = value;
     }
   }
   progress(20);

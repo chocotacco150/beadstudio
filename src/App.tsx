@@ -29,6 +29,10 @@ import {
   HelpCircle,
   FileJson,
   FileText,
+  PaintBucket,
+  Wand2,
+  Scissors,
+  Columns2,
 } from "lucide-react";
 import type {
   Crop,
@@ -59,11 +63,16 @@ import {
   exportShareHTML,
   filename,
   pdfLayout,
+  exportMaterialsCSV,
 } from "./core/export";
+import { conversionPresets, presetSettings } from "./core/presets";
 import { useHistory } from "./hooks/useHistory";
 import { PatternCanvas } from "./components/PatternCanvas";
 import { CropDialog } from "./components/CropDialog";
 import { Modal } from "./components/Modal";
+import { PresetDialog } from "./components/PresetDialog";
+import { CleanupDialog } from "./components/CleanupDialog";
+import { PaletteDialog } from "./components/PaletteDialog";
 const defaultSettings: ConvertSettings = {
   width: 128,
   height: 128,
@@ -74,6 +83,8 @@ const defaultSettings: ConvertSettings = {
   mode: "photo",
   smoothing: 1,
   contrast: 8,
+  brightness: 0,
+  saturation: 100,
   removeBackground: false,
   backgroundTolerance: 8,
 };
@@ -84,6 +95,8 @@ const samples = {
 const toolItems = [
   { key: "brush", label: "画笔", shortcut: "B", icon: Brush },
   { key: "eraser", label: "橡皮擦", shortcut: "E", icon: Eraser },
+  { key: "fill", label: "连片填色", shortcut: "F", icon: PaintBucket },
+  { key: "clear", label: "连片擦除", shortcut: "D", icon: Scissors },
   { key: "picker", label: "吸管", shortcut: "I", icon: Pipette },
   { key: "pan", label: "移动", shortcut: "H", icon: Hand },
 ] as const;
@@ -111,7 +124,7 @@ export default function App() {
       coordinates: true,
     });
   const [dialog, setDialog] = useState<
-      "crop" | "export" | "replace" | "help" | null
+      "crop" | "export" | "replace" | "help" | "presets" | "cleanup" | "palette" | null
     >(null),
     [compare, setCompare] = useState(false),
     [paletteTab, setPaletteTab] = useState<"used" | "all">("used"),
@@ -121,7 +134,7 @@ export default function App() {
     ),
     [hover, setHover] = useState("每格一颗拼豆"),
     [dragging, setDragging] = useState(false);
-  const [exportType, setExportType] = useState<"pattern" | "chart" | "pdf" | "html">(
+  const [exportType, setExportType] = useState<"pattern" | "chart" | "pdf" | "html" | "csv">(
       "chart",
     ),
     [beadMm, setBeadMm] = useState(5),
@@ -273,7 +286,7 @@ export default function App() {
       setBusy(false);
     }
   }
-  async function generate() {
+  async function generate(nextSettings = settings) {
     if (!image || busy) return;
     setBusy(true);
     setProgress(0);
@@ -281,7 +294,7 @@ export default function App() {
       const p = await convertImage(
         image,
         crop,
-        settings,
+        nextSettings,
         palette,
         sourceName,
         setProgress,
@@ -297,6 +310,13 @@ export default function App() {
       setBusy(false);
     }
   }
+  function applyPreset(mode: ConvertSettings["mode"]) {
+    const next = presetSettings(settings, mode);
+    setSettings(next);
+    setDialog(null);
+    if (image) void generate(next);
+    else notify("转换预设已选择，上传原图后可使用。");
+  }
   async function useSample(kind: "photo" | "pixel") {
     if (busy) return;
     setBusy(true);
@@ -306,7 +326,7 @@ export default function App() {
       const nextSettings =
         kind === "photo"
           ? {
-              ...settings,
+              ...presetSettings(settings, "photo"),
               mode: "photo" as const,
               width: 128,
               height: 128,
@@ -315,7 +335,7 @@ export default function App() {
               removeBackground: false,
             }
           : {
-              ...settings,
+              ...presetSettings(settings, "pixel"),
               mode: "pixel" as const,
               width: 64,
               height: 64,
@@ -396,7 +416,7 @@ export default function App() {
   function selectColor(code: string) {
     setSelected(code);
     setHighlight((h) => (h === code ? null : code));
-    setTool("brush");
+    setTool((current) => current === "fill" ? "fill" : "brush");
   }
   async function copyRequiredCodes() {
     try {
@@ -418,6 +438,7 @@ export default function App() {
       if (exportType === "pattern") await exportPatternPNG(pattern);
       else if (exportType === "chart") await exportChartPNG(pattern);
       else if (exportType === "html") exportShareHTML(pattern);
+      else if (exportType === "csv") exportMaterialsCSV(pattern);
       else await exportPDF(pattern, beadMm, setProgress, pdfMode);
       setDialog(null);
       notify("导出完成，文件已下载。");
@@ -606,6 +627,13 @@ export default function App() {
               )}
             </section>
             <section className="control-section">
+              <div className="section-heading"><h3>转换风格</h3><button className="inline-action" disabled={busy || !image || !dimensions} onClick={() => setDialog("presets")}><Columns2 size={14} />对比效果</button></div>
+              <div className="conversion-presets">
+                {conversionPresets.map((p) => <button key={p.id} className={settings.mode === p.id ? "active" : ""} disabled={busy} aria-pressed={settings.mode === p.id} title={p.description} onClick={() => applyPreset(p.id)}><strong>{p.name}</strong><span>{p.short}</span></button>)}
+              </div>
+              <p className="detail-note preset-note">点击预设立即生成，或先对比四种效果。尺寸与裁剪区域保持当前设置。</p>
+            </section>
+            <section className="control-section">
               <div className="section-heading">
                 <h3>图纸尺寸</h3>
                 <span>每格 = 1 颗</span>
@@ -692,22 +720,9 @@ export default function App() {
               )}
             </section>
             <section className="control-section photo-controls">
-              <h3>照片处理</h3>
-              <label className="field-label">
-                图像类型
-                <select
-                  aria-label="图像类型"
-                  value={settings.mode}
-                  disabled={busy}
-                  onChange={(e) =>
-                    updateSetting("mode", e.target.value as "photo" | "pixel")
-                  }
-                >
-                  <option value="photo">日常照片 · 区域采样</option>
-                  <option value="pixel">像素插画 · 清晰色块</option>
-                </select>
-              </label>
-              {settings.mode === "photo" && (
+              <h3>图像微调</h3>
+              <p className="detail-note preset-note">{conversionPresets.find((p) => p.id === settings.mode)!.description}</p>
+              {settings.mode !== "pixel" && (
                 <>
                   <label className="field-label">
                     碎色简化
@@ -730,7 +745,7 @@ export default function App() {
                       aria-label="轮廓对比"
                       type="range"
                       min={0}
-                      max={30}
+                      max={50}
                       step={2}
                       value={settings.contrast}
                       disabled={busy}
@@ -739,6 +754,8 @@ export default function App() {
                       }
                     />
                   </label>
+                  <label className="range-label">画面亮度 <span>{(settings.brightness ?? 0) > 0 ? "+" : ""}{settings.brightness ?? 0}%</span><input aria-label="画面亮度" type="range" min={-30} max={30} step={2} value={settings.brightness ?? 0} disabled={busy} onChange={(e) => updateSetting("brightness", Number(e.target.value))} /></label>
+                  {settings.mode !== "lineart" && <label className="range-label">色彩饱和度 <span>{settings.saturation ?? 100}%</span><input aria-label="色彩饱和度" type="range" min={0} max={160} step={5} value={settings.saturation ?? 100} disabled={busy} onChange={(e) => updateSetting("saturation", Number(e.target.value))} /></label>}
                 </>
               )}
               <label className="field-label">
@@ -805,12 +822,14 @@ export default function App() {
                   ))}
                 </select>
               </label>
+              <button className="secondary available-colors-button" disabled={busy} onClick={() => setDialog("palette")}><PaletteIcon size={14} />只用我有的色号</button>
+              <p className="detail-note palette-reference">{palette.source ? <>当前匹配 {palette.colors.length} 色，色值来自第三方参考。<a href={palette.source} target="_blank" rel="noreferrer">查看来源 ↗</a></> : palette.description ?? "使用你导入的自定义色板。"}</p>
               <div className="section-heading little">
                 <span>最多使用颜色</span>
                 <strong>{settings.maxColors} 色</strong>
               </div>
               <div className="preset-row colors-presets">
-                {[8, 16, 24, 32].map((n) => (
+                {[2, 8, 16, 24, 32].map((n) => (
                   <button
                     key={n}
                     className={settings.maxColors === n ? "active" : ""}
@@ -874,7 +893,7 @@ export default function App() {
             <button
               className="generate-button primary"
               disabled={busy || !image || !dimensions}
-              onClick={generate}
+              onClick={() => void generate()}
             >
               {busy ? (
                 <LoaderCircle className="spin" size={17} />
@@ -903,6 +922,7 @@ export default function App() {
                   key={t.key}
                   className={`tool-button ${tool === t.key ? "active" : ""}`}
                   aria-label={`${t.label} (${t.shortcut})`}
+                  aria-pressed={tool === t.key}
                   title={`${t.label} (${t.shortcut})`}
                   disabled={busy}
                   onClick={() => setTool(t.key)}
@@ -928,6 +948,7 @@ export default function App() {
               >
                 <Replace size={18} />
               </button>
+              <button className="tool-button" title="清理杂点与精简色号" aria-label="清理杂点与精简色号" disabled={!pattern || busy} onClick={() => setDialog("cleanup")}><Wand2 size={18} /></button>
             </div>
             <div className="undo-group">
               <button
@@ -1095,7 +1116,7 @@ export default function App() {
               <strong>{editPalette.name}</strong>
               <span>
                 {editPalette.source
-                  ? "第三方色号对照 · 221 色"
+                  ? `第三方色号对照 · ${editPalette.colors.length} 色`
                   : "自定义 / 示例色板"}
                 {editPalette.source && (
                   <a
@@ -1218,7 +1239,7 @@ export default function App() {
           <div className="palette-bottom">
             <p>
               <Info size={14} />
-              点击颜色选取画笔，并高亮同色格子。
+              点击颜色选取色号，并高亮同色格子。
             </p>
             <div>
               <button
@@ -1243,7 +1264,7 @@ export default function App() {
               </button>
             </div>
             {editPalette.description && (
-              <small tabIndex={0}>{editPalette.description}</small>
+              <details className="palette-source-details"><summary>色板来源与说明</summary><small>{editPalette.description}</small></details>
             )}
           </div>
         </aside>
@@ -1341,6 +1362,7 @@ export default function App() {
                 label: "分享 HTML · 离线图纸",
                 desc: "单个文件，含图纸、色号与用量，浏览器直接打开",
               },
+              { key: "csv", icon: FileText, label: "用量清单 CSV", desc: "色板、色号、HEX 和颗数，可用 Excel 打开备料" },
             ].map((o) => (
               <label
                 key={o.key}
@@ -1483,13 +1505,12 @@ export default function App() {
               上传图片或使用示例，按需裁剪；选择图纸尺寸、色板和颜色上限，再生成图纸。
             </p>
             <p>
-              2. 选择颜色后，用画笔 B、橡皮擦 E、吸管 I 或移动 H 调整图纸。Ctrl
+              2. 选择颜色后，用画笔 B、橡皮擦 E、连片填色 F、连片擦除 D、吸管 I 或移动 H 调整图纸。连片工具只作用于相邻的同色格，整图替色作用于全图。Ctrl
               / ⌘ + Z 撤销，Ctrl / ⌘ + Shift + Z 重做。滚轮缩放。
             </p>
             <p>
               3. 保存项目 JSON
-              留存编辑结果；项目包含格子和色板，不包含原始图片。导出 PNG 或 A4
-              PDF 用于制作。
+              留存编辑结果；项目包含格子和色板，不包含原始图片。导出单页 PDF、PNG 或离线 HTML 分享，用量清单可导出 CSV。
             </p>
             <p>色板 JSON 格式：</p>
             <pre>
@@ -1503,11 +1524,14 @@ export default function App() {
             </p>
             <p>
               照片推荐 128 格 / 32
-              色起步。碎色简化减少照片噪点并保留边缘；像素插画模式使用最近邻采样。纯色去背景只处理与边缘连通的相近颜色，不适用于复杂场景的自动主体识别。
+              色起步。点击「对比效果」查看四种转换预设；「清理杂点」可预览合并结果并保护选中色号。纯色去背景只处理与边缘连通的相近颜色，不适用于复杂场景的自动主体识别。
             </p>
           </div>
         </Modal>
       )}
+      {dialog === "presets" && image && <PresetDialog image={image} crop={crop} settings={settings} palette={palette} onApply={applyPreset} onClose={() => setDialog(null)} />}
+      {dialog === "cleanup" && pattern && <CleanupDialog pattern={pattern} selected={selectedColor.code} onClose={() => setDialog(null)} onApply={(p) => { history.commit(p); setHighlight(null); setDialog(null); notify("清理已应用，可以撤销恢复。"); }} />}
+      {dialog === "palette" && <PaletteDialog palette={palette} onClose={() => setDialog(null)} onApply={(p) => { setPalettes((list) => [...list.filter((v) => v.name !== p.name), p]); setPalette(p); setDialog(null); notify(`已保存 ${p.colors.length} 个可用色号，点击生成后应用。`); }} />}
     </div>
   );
 }

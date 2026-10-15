@@ -3,6 +3,10 @@ import { patternCanvas } from "./render";
 import type { Pattern } from "./types";
 import { createShareHTML } from "./share";
 import { createSinglePagePDF } from "./single-page-pdf";
+import { materialsCSV } from "./materials";
+export function exportMaterialsCSV(pattern: Pattern) {
+  downloadBlob(new Blob(["\uFEFF", materialsCSV(pattern)], { type: "text/csv;charset=utf-8" }), `${filename(pattern.name)}-用量清单.csv`);
+}
 export function filename(name: string) {
   return name.replace(/[\\/:*?"<>|]/g, "_").slice(0, 80) || "我的拼豆";
 }
