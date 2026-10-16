@@ -3,5 +3,7 @@ dist/
 .sites-runtime/
 artifacts/
 runtime/
+/public/models/*.onnx
+/public/cutout-runtime/
 *.log
 *.tsbuildinfo

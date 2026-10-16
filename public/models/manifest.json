@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "verifiedOn": "2026-10-16",
+  "upstreamProject": "https://github.com/xuebinqin/U-2-Net",
+  "upstreamLicense": "Apache-2.0",
+  "onnxDistributor": "https://github.com/danielgatis/rembg",
+  "distributorLicense": "MIT",
+  "preprocessing": {
+    "size": [320, 320],
+    "layout": "NCHW",
+    "dtype": "float32",
+    "channelOrder": "RGB",
+    "scale": "divide by the maximum RGB channel value of the resized image (minimum denominator 1e-6)",
+    "mean": [0.485, 0.456, 0.406],
+    "standardDeviation": [0.229, 0.224, 0.225]
+  },
+  "postprocessing": {
+    "outputIndex": 0,
+    "channelIndex": 0,
+    "normalization": "global min-max with constant-output guard",
+    "range": [0, 1],
+    "rescaleToOriginalSize": true,
+    "preserveOriginalAlpha": true
+  },
+  "models": [
+    {
+      "id": "fast",
+      "name": "U2NETP",
+      "file": "u2netp.onnx",
+      "url": "https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2netp.onnx",
+      "bytes": 4574861,
+      "sha256": "309c8469258dda742793dce0ebea8e6dd393174f89934733ecc8b14c76f4ddd8",
+      "upstreamMd5": "8e83ca70e441ab06c318d82300c84806",
+      "inputName": "input.1",
+      "inputShape": [1, 3, 320, 320],
+      "outputName": "1959",
+      "outputShape": [1, 1, 320, 320],
+      "modified": false
+    },
+    {
+      "id": "quality",
+      "name": "U2NET",
+      "file": "u2net.onnx",
+      "url": "https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2net.onnx",
+      "bytes": 175997641,
+      "sha256": "8d10d2f3bb75ae3b6d527c77944fc5e7dcd94b29809d47a739a7a728a912b491",
+      "upstreamMd5": "60024c5c889badc19c04ad937298a77b",
+      "inputName": "input.1",
+      "inputShape": [1, 3, 320, 320],
+      "outputName": "1959",
+      "outputShape": [1, 1, 320, 320],
+      "modified": false
+    }
+  ],
+  "references": [
+    "https://github.com/xuebinqin/U-2-Net/blob/master/LICENSE",
+    "https://github.com/danielgatis/rembg/blob/main/LICENSE.txt",
+    "https://github.com/danielgatis/rembg/blob/main/rembg/sessions/base.py",
+    "https://github.com/danielgatis/rembg/blob/main/rembg/sessions/u2netp.py",
+    "https://github.com/danielgatis/rembg/blob/main/rembg/sessions/u2net.py"
+  ]
+}

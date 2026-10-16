@@ -49,6 +49,9 @@ function errorResponse(res, status, message, head = false) {
 const server = createServer(async (req, res) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Cache-Control', 'no-cache');
+  // Enable local WASM CPU threads. Every runtime/model asset is bundled on this origin.
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
   const head = req.method === 'HEAD';
   if (req.method !== 'GET' && !head) {
     res.setHeader('Allow', 'GET, HEAD');

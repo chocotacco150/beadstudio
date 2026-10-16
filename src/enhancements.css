@@ -71,3 +71,9 @@
   .palette-provenance { margin-left: 18px; margin-right: 18px; }
   .palette-pick-grid { margin: 0 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+.version-badge { margin-left: 5px; padding: 3px 7px; color: #126b65; background: #e8f5f1; border-radius: 5px; font-size: 10px; font-weight: 700; }
+.subject-entry { margin-top: 12px; }
+.subject-button { width: 100%; justify-content: center; background: #eaf5f1; color: #176b62; border-color: #c5e2d9; }
+.subject-button span { font-size: 10px; }
+.subject-applied { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 10px; }
+.subject-applied > span { display: flex; align-items: center; gap: 4px; color: #176b62; }

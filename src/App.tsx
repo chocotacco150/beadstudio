@@ -73,6 +73,9 @@ import { Modal } from "./components/Modal";
 import { PresetDialog } from "./components/PresetDialog";
 import { CleanupDialog } from "./components/CleanupDialog";
 import { PaletteDialog } from "./components/PaletteDialog";
+import { CutoutDialog } from "./components/CutoutDialog";
+import { prepareCutout } from "./core/cutout-image";
+import type { SubjectMask } from "./core/mask";
 const defaultSettings: ConvertSettings = {
   width: 128,
   height: 128,
@@ -110,6 +113,11 @@ export default function App() {
     [image, setImage] = useState<HTMLImageElement | null>(null),
     [sourceName, setSourceName] = useState(samples.photo.name),
     [crop, setCrop] = useState<Crop>(fullCrop);
+  const [originalImage, setOriginalImage] = useState<HTMLImageElement | null>(null);
+  const [originalSource, setOriginalSource] = useState(samples.photo.src);
+  const [subjectMask, setSubjectMask] = useState<SubjectMask | null>(null);
+  const [subjectTrim, setSubjectTrim] = useState(true);
+  const cutoutURL = useRef<string | null>(null);
   const [busy, setBusy] = useState(false),
     [progress, setProgress] = useState(0),
     [message, setMessage] = useState<{ text: string; error: boolean } | null>(
@@ -124,7 +132,7 @@ export default function App() {
       coordinates: true,
     });
   const [dialog, setDialog] = useState<
-      "crop" | "export" | "replace" | "help" | "presets" | "cleanup" | "palette" | null
+      "crop" | "export" | "replace" | "help" | "presets" | "cleanup" | "palette" | "cutout" | null
     >(null),
     [compare, setCompare] = useState(false),
     [paletteTab, setPaletteTab] = useState<"used" | "all">("used"),
@@ -192,6 +200,7 @@ export default function App() {
       .then(async (img) => {
         if (!active) return;
         setImage(img);
+        setOriginalImage(img);
         const p = await convertImage(
           img,
           fullCrop,
@@ -220,6 +229,7 @@ export default function App() {
   useEffect(
     () => () => {
       if (objectURL.current) URL.revokeObjectURL(objectURL.current);
+      if (cutoutURL.current) URL.revokeObjectURL(cutoutURL.current);
       if (timer.current) clearTimeout(timer.current);
     },
     [],
@@ -264,6 +274,11 @@ export default function App() {
       objectURL.current = data.src;
       setImage(data.image);
       setSource(data.src);
+      setOriginalImage(data.image);
+      setOriginalSource(data.src);
+      setSubjectMask(null);
+      if (cutoutURL.current) URL.revokeObjectURL(cutoutURL.current);
+      cutoutURL.current = null;
       setCrop(fullCrop);
       const name = file.name.replace(/\.[^.]+$/, "");
       setSourceName(name);
@@ -317,6 +332,48 @@ export default function App() {
     if (image) void generate(next);
     else notify("转换预设已选择，上传原图后可使用。");
   }
+  async function applyCutout(result: { mask: SubjectMask; trim: boolean }) {
+    if (!originalImage || busy) return;
+    setBusy(true);
+    setProgress(0);
+    let prepared: Awaited<ReturnType<typeof prepareCutout>> | null = null;
+    try {
+      prepared = await prepareCutout(originalImage, result.mask, result.trim);
+      const next = { ...settings, background: null, removeBackground: false };
+      const p = await convertImage(prepared.image, fullCrop, next, palette, sourceName, setProgress);
+      if (cutoutURL.current) URL.revokeObjectURL(cutoutURL.current);
+      cutoutURL.current = prepared.src;
+      setImage(prepared.image);
+      setSource(prepared.src);
+      setSubjectMask(result.mask);
+      setSubjectTrim(result.trim);
+      setCrop(fullCrop);
+      setSettings(next);
+      history.commit(p);
+      setSelected(p.palette.colors[0].code);
+      setHighlight(null);
+      setDialog(null);
+      setMobileTab("canvas");
+      notify("主体已应用并生成图纸；背景为空白格，不计入用量。图纸可撤销，原图可随时恢复。");
+    } catch (error) {
+      if (prepared) URL.revokeObjectURL(prepared.src);
+      // Keep dialog open with its editable mask and error message.
+      throw error;
+    } finally { setBusy(false); }
+  }
+  async function restoreOriginal() {
+    if (!originalImage || busy) return;
+    setBusy(true); setProgress(0);
+    try {
+      const p = await convertImage(originalImage, fullCrop, settings, palette, sourceName, setProgress);
+      setImage(originalImage); setSource(originalSource); setSubjectMask(null); setCrop(fullCrop);
+      if (cutoutURL.current) URL.revokeObjectURL(cutoutURL.current);
+      cutoutURL.current = null;
+      history.commit(p); setHighlight(null); setSelected(p.palette.colors[0].code);
+      notify("已恢复原图并重新生成。图纸编辑可通过撤销找回。");
+    } catch (error) { notify(error instanceof Error ? error.message : "恢复原图失败", true); }
+    finally { setBusy(false); }
+  }
   async function useSample(kind: "photo" | "pixel") {
     if (busy) return;
     setBusy(true);
@@ -356,6 +413,11 @@ export default function App() {
         objectURL.current = null;
       }
       setImage(img);
+      setOriginalImage(img);
+      setOriginalSource(sample.src);
+      setSubjectMask(null);
+      if (cutoutURL.current) URL.revokeObjectURL(cutoutURL.current);
+      cutoutURL.current = null;
       setSettings(nextSettings);
       setSource(sample.src);
       setSourceName(sample.name);
@@ -396,6 +458,11 @@ export default function App() {
           keepRatio: false,
         }));
         setImage(null);
+        setOriginalImage(null);
+        setOriginalSource("");
+        setSubjectMask(null);
+        if (cutoutURL.current) URL.revokeObjectURL(cutoutURL.current);
+        cutoutURL.current = null;
         if (objectURL.current) {
           URL.revokeObjectURL(objectURL.current);
           objectURL.current = null;
@@ -470,7 +537,7 @@ export default function App() {
           </strong>
         </a>
         <div className="header-divider" />
-        <span className="header-label">图片转拼豆图纸</span>
+        <span className="header-label">图片转拼豆图纸 <small className="version-badge">v1.3</small></span>
         <div className="header-actions">
           <button
             className="text-button"
@@ -613,7 +680,7 @@ export default function App() {
                   像素插画
                 </button>
               </div>
-              {source === samples.photo.src && (
+              {originalSource === samples.photo.src && (
                 <p className="sample-credit">
                   Don McCulley · CC0 ·{" "}
                   <a
@@ -625,6 +692,10 @@ export default function App() {
                   </a>
                 </p>
               )}
+              <div className="subject-entry">
+                <button className="secondary subject-button" disabled={!originalImage || busy} onClick={() => setDialog("cutout")}><Scissors size={16} />{subjectMask ? "修整主体 / 重新识别" : "识别主体 · AI 抠图"}<span>本机处理</span></button>
+                {subjectMask ? <div className="subject-applied"><span><Check size={13} />已应用主体蒙版</span><button className="inline-action" disabled={busy} onClick={() => void restoreOriginal()}>恢复原图</button></div> : <p className="detail-note">去掉复杂背景后再转图纸；支持手动补回和擦除。</p>}
+              </div>
             </section>
             <section className="control-section">
               <div className="section-heading"><h3>转换风格</h3><button className="inline-action" disabled={busy || !image || !dimensions} onClick={() => setDialog("presets")}><Columns2 size={14} />对比效果</button></div>
@@ -795,12 +866,12 @@ export default function App() {
                     />
                   </label>
                   <p className="detail-note">
-                    适合纯色纸张、白墙等背景。从边缘去除相近颜色；复杂场景请保留背景并裁剪主体。
+                    适合纯色纸张、白墙等背景。从边缘去除相近颜色；复杂背景可使用上方「识别主体」。
                   </p>
                 </>
               ) : (
                 <p className="detail-note">
-                  有背景的照片可直接转换。先裁剪突出主体，或调高碎色简化减少背景纹理。
+                  {subjectMask ? "正在使用抠图结果。透明区域默认不放拼豆；下方背景色可改为实色。" : "有背景的照片可直接转换，也可先「识别主体」去背景，再生成。"}
                 </p>
               )}
             </section>
@@ -1029,7 +1100,7 @@ export default function App() {
               <div className="original-preview">
                 <span>原始图片</span>
                 <div className="checker">
-                  <img src={source} alt="原图对比" />
+                  <img src={originalSource || source} alt="原图对比" />
                 </div>
                 <small>转换使用所选裁剪区域</small>
               </div>
@@ -1326,6 +1397,7 @@ export default function App() {
           }}
         />
       )}
+      {dialog === "cutout" && originalImage && <CutoutDialog image={originalImage} name={sourceName} initialMask={subjectMask} initialTrim={subjectTrim} onClose={() => { if (!busy) setDialog(null); }} onApply={applyCutout} />}
       {dialog === "export" && pattern && (
         <Modal
           title="导出你的拼豆作品"
@@ -1502,7 +1574,7 @@ export default function App() {
           <div className="help-content">
             <p>
               1.
-              上传图片或使用示例，按需裁剪；选择图纸尺寸、色板和颜色上限，再生成图纸。
+              上传图片或使用示例，按需裁剪。点击「识别主体 · AI 抠图」在本机去除复杂背景，可擦除、补回、点选保留主体及调整边缘，再应用生成。选择图纸尺寸、色板和颜色上限。
             </p>
             <p>
               2. 选择颜色后，用画笔 B、橡皮擦 E、连片填色 F、连片擦除 D、吸管 I 或移动 H 调整图纸。连片工具只作用于相邻的同色格，整图替色作用于全图。Ctrl
@@ -1510,7 +1582,7 @@ export default function App() {
             </p>
             <p>
               3. 保存项目 JSON
-              留存编辑结果；项目包含格子和色板，不包含原始图片。导出单页 PDF、PNG 或离线 HTML 分享，用量清单可导出 CSV。
+              留存编辑结果；项目包含格子和色板，不包含原始照片或抠图蒙版。需要留存抠图请在抠图窗口另存透明 PNG，下次可重新上传。导出单页 PDF、PNG 或离线 HTML 分享，用量清单可导出 CSV。
             </p>
             <p>色板 JSON 格式：</p>
             <pre>
@@ -1524,7 +1596,7 @@ export default function App() {
             </p>
             <p>
               照片推荐 128 格 / 32
-              色起步。点击「对比效果」查看四种转换预设；「清理杂点」可预览合并结果并保护选中色号。纯色去背景只处理与边缘连通的相近颜色，不适用于复杂场景的自动主体识别。
+              色起步。点击「对比效果」查看四种转换预设；「清理杂点」可预览合并结果并保护选中色号。AI 抠图适合主体清晰的照片，复杂毛发、透明物体及多主体可通过手动修补处理。模型与引擎随本地包附带，照片不上传。轻量模式更快，完整模式占用更多内存。
             </p>
           </div>
         </Modal>
