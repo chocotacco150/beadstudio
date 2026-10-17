@@ -1,0 +1,52 @@
+appId: com.chocotacco150.beadstudio
+productName: 豆图
+executableName: BeadStudio
+artifactName: BeadStudio-${version}-Windows-x64.${ext}
+asar: true
+compression: normal
+npmRebuild: false
+forceCodeSigning: false
+directories:
+  app: artifacts/desktop-package/app
+  output: artifacts/desktop-release
+  buildResources: build-resources
+files:
+  - package.json
+  - desktop/**/*.cjs
+  - desktop/**/*.mjs
+  - desktop/**/*.json
+  - '!desktop/**/*.{test,spec}.{cjs,mjs,json}'
+  - '!**/node_modules/**'
+extraResources:
+  - from: dist
+    to: dist
+    filter:
+      - '**/*'
+      - '!**/*.map'
+      - '!**/*.bead.json'
+  - from: artifacts/desktop-package/licenses
+    to: licenses
+    filter:
+      - '**/*'
+win:
+  target:
+    - target: portable
+      arch:
+        - x64
+  icon: build-resources/app.ico
+  requestedExecutionLevel: asInvoker
+  signExecutable: false
+portable:
+  requestExecutionLevel: user
+  # 26.15.3 uses APP_DIR_64 + NSIS File /r here: extract directly once,
+  # instead of unpacking a .7z and copying the full app a second time.
+  useZip: true
+  # In the pinned builder, true omits UNPACK_DIR_NAME, giving each launch
+  # its own $PLUGINSDIR/app. false actually generates a shared build ID.
+  unpackDirName: true
+  splashImage: build-resources/startup.bmp
+  unicode: true
+electronLanguages:
+  - zh-CN
+  - en-US
+publish: null

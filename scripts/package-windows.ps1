@@ -10,7 +10,9 @@ Set-StrictMode -Version Latest
 # This packages an already-built release. It neither installs dependencies nor downloads models.
 $beadProject = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $beadVersion = (Get-Content -LiteralPath (Join-Path $beadProject 'package.json') -Raw | ConvertFrom-Json).version
-if ($beadVersion -ne '1.3.0') { throw '此脚本用于 v1.3.0，请先检查 package.json 版本。' }
+if ($beadVersion -notmatch '^1\.3\.[01]$') { throw '此脚本用于 1.3 系列，请先检查 package.json 版本。' }
+$beadZipVersion = if ($beadVersion -eq '1.3.0') { '1.3' } else { $beadVersion }
+$beadExpectedZipName = "拼豆工具-v$beadZipVersion-Windows.zip"
 
 if (-not $NodePath) {
   $beadBundledNode = Join-Path $beadProject 'runtime\node.exe'
@@ -36,12 +38,12 @@ if (-not (Test-Path -LiteralPath $beadLicensePath -PathType Leaf) -or (Get-FileH
   throw '缺少或修改了 Node.js v24.19.0 完整许可证，请恢复 scripts/licenses/Node-LICENSE.txt。'
 }
 
-if (-not $OutputPath) { $OutputPath = Join-Path ([Environment]::GetFolderPath('Desktop')) '拼豆工具-v1.3-Windows.zip' }
+if (-not $OutputPath) { $OutputPath = Join-Path ([Environment]::GetFolderPath('Desktop')) $beadExpectedZipName }
 $OutputPath = [IO.Path]::GetFullPath($OutputPath)
 if ([IO.Path]::GetExtension($OutputPath) -ne '.zip') { throw 'OutputPath 必须是 .zip 文件路径。' }
 $beadOutputName = [IO.Path]::GetFileName($OutputPath)
-if ($beadOutputName -match 'v1\.2|^拼豆工具-本地版-Windows\.zip$') { throw '请保留旧版本压缩包，使用新的 v1.3 文件名。' }
-if ((Test-Path -LiteralPath $OutputPath) -and $beadOutputName -ne '拼豆工具-v1.3-Windows.zip') { throw '为避免覆盖个人文件，仅允许覆盖同名的 拼豆工具-v1.3-Windows.zip。' }
+if ($beadOutputName -match 'v1\.2|^拼豆工具-本地版-Windows\.zip$') { throw '请保留旧版本压缩包，使用本版本对应的 Windows 文件名。' }
+if ((Test-Path -LiteralPath $OutputPath) -and $beadOutputName -ne $beadExpectedZipName) { throw "为避免覆盖个人文件，仅允许覆盖同名的 $beadExpectedZipName。" }
 $beadOutputParent = [IO.Path]::GetDirectoryName($OutputPath)
 if (-not (Test-Path -LiteralPath $beadOutputParent -PathType Container)) { throw '输出目录不存在，请先创建输出目录。' }
 
@@ -96,12 +98,14 @@ function Copy-BeadTree([string]$SourceDirectory, [string]$DestinationDirectory, 
 try {
   New-Item -ItemType Directory -Path $beadPackageRoot | Out-Null
   $beadStageCreated = $true
-  $beadRootFiles = @('package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', 'tsconfig.json', 'vite.config.ts', 'vitest.config.ts', 'index.html', 'README.md', 'VERIFICATION.md', '.gitignore', '本地运行.cmd', '启动工具.cmd', 'start.ps1')
+  $beadRootFiles = @('package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml', 'tsconfig.json', 'vite.config.ts', 'vitest.config.ts', 'index.html', 'README.md', 'WINDOWS.md', 'VERIFICATION.md', 'electron-builder.yml', '.gitignore', '本地运行.cmd', '启动工具.cmd', 'start.ps1')
   foreach ($beadFile in $beadRootFiles) { Copy-Item -LiteralPath (Join-Path $beadProject $beadFile) -Destination (Join-Path $beadPackageRoot $beadFile) }
   $beadSourceExtensions = @('.ts', '.tsx', '.css', '.json', '.html', '.svg', '.png', '.jpg', '.jpeg', '.webp', '.txt', '.md')
   $beadAssetExtensions = @('.html', '.js', '.mjs', '.css', '.json', '.svg', '.png', '.jpg', '.jpeg', '.webp', '.ico', '.wasm', '.onnx', '.txt', '.md', '.woff', '.woff2')
   Copy-BeadTree (Join-Path $beadProject 'src') (Join-Path $beadPackageRoot 'src') $beadSourceExtensions
   Copy-BeadTree (Join-Path $beadProject 'scripts') (Join-Path $beadPackageRoot 'scripts') @('.mjs', '.cjs', '.ps1', '.txt', '.md')
+  Copy-BeadTree (Join-Path $beadProject 'desktop') (Join-Path $beadPackageRoot 'desktop') @('.mjs', '.cjs', '.json')
+  Copy-BeadTree (Join-Path $beadProject 'build-resources') (Join-Path $beadPackageRoot 'build-resources') @('.ico', '.png', '.svg', '.bmp')
   Copy-BeadTree (Join-Path $beadProject 'public') (Join-Path $beadPackageRoot 'public') $beadAssetExtensions
   Copy-BeadTree (Join-Path $beadProject 'dist') (Join-Path $beadPackageRoot 'dist') $beadAssetExtensions
   $beadRuntimeDirectory = Join-Path $beadPackageRoot 'runtime'
@@ -110,7 +114,7 @@ try {
   Copy-Item -LiteralPath $beadLicensePath -Destination (Join-Path $beadRuntimeDirectory 'LICENSE.txt')
   $beadUtf8Bom = New-Object System.Text.UTF8Encoding($true)
   $beadQuickStart = @"
-豆图 v1.3 · Windows x64 本地版
+豆图 v$beadVersion · Windows x64 本地版
 
 1. 对压缩包选择「全部解压」，不要在压缩包内运行。
 2. 打开解压后的 bead-studio 文件夹，双击「本地运行.cmd」。

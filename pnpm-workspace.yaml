@@ -2,3 +2,7 @@ allowBuilds:
   esbuild: true
   core-js: false
   protobufjs: false
+  electron: true
+  electron-winstaller: false
+minimumReleaseAgeExclude:
+  - electron@44.8.0
